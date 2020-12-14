@@ -16,24 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message
+package org.beangle.notify
 
-import java.util.List
-//remove if not needed
-import scala.collection.JavaConversions._
-/**
- * 消息队列
- */
-trait MessageQueue[T <: Message] {
+import java.util.Properties
 
-  def size(): Int
+abstract class AbstractMessage extends Message {
 
-  def poll(): T
+  var subject: String = _
 
-  def getMessages(): List[T]
+  var text: String = _
 
-  def addMessages(contexts: List[T]): Unit
+  var properties: Properties = new Properties
 
-  def addMessage(message: T): Unit
+  var contentType: String = Message.TEXT
 
+  // Assert.isTrue(Strings.contains(contentType, "charset="), "contentType should contain charset")
 }

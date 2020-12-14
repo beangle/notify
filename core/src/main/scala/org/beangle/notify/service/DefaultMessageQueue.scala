@@ -16,23 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message
+package org.beangle.notify.service
 
+import org.beangle.notify.MessageQueue
+import org.beangle.notify.Message
+import java.util.Queue
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.List
-import scala.collection.JavaConversions._
 
-class SimpleMessage extends AbstractMessage {
 
-  private var recipients: List[String] = new java.util.ArrayList()
+class DefaultMessageQueue[T <: Message] extends MessageQueue[T] {
 
-  def this(recipient: String, subject: String, text: String) {
-    this()
-    this.recipients.add(recipient)
-    setSubject(subject)
-    setText(text)
+  private var queue: Queue[T] = new LinkedBlockingQueue[T]
+
+  def getMessages(): List[T] = new java.util.ArrayList[T](queue)
+
+  def addMessage(message: T): Unit = {
+    queue.add(message)
   }
 
-  override def getContentType(): String = "text/plain"
+  def addMessages(contexts: List[T]): Unit = {
+    queue.addAll(contexts)
+  }
 
-  def getRecipients(): List[String] = this.recipients
+  def poll(): T = queue.poll()
+
+  def size(): Int = queue.size()
 }

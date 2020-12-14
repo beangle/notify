@@ -16,24 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message
+package org.beangle.notify
 
-//remove if not needed
-import scala.collection.JavaConversions._
-
-/**
- * 消息通知任务
- */
-trait NotificationTask[T <: Message] {
-
-  def getNotifier(): Notifier[T]
-
-  def setNotifier(notifier: Notifier[T]): Unit
-
-  def getMessageQueue(): MessageQueue[T]
-
-  def setMessageQueue(messageQueue: MessageQueue[T]): Unit
-
-  def send(): Unit
-
+@SerialVersionUID(1L)
+class NotificationException(message: String, cause: Throwable) extends RuntimeException(message, cause) {
 }

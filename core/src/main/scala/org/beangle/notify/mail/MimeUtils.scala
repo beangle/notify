@@ -16,24 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.mail
-import java.util.List
+package org.beangle.notify.mail
+
+import scala.collection.mutable
 import javax.mail.internet.InternetAddress
-import java.util.Collections
 import org.beangle.commons.lang.Strings
-import scala.collection.JavaConversions._
 
 object MimeUtils {
 
   def parseAddress(address: String, encoding: String): List[InternetAddress] = {
-    if (Strings.isEmpty(address)) Collections.emptyList()
+    if (Strings.isEmpty(address)) List.empty
     try {
       var parsed = InternetAddress.parse(address)
-      var returned = new java.util.ArrayList[InternetAddress]()
-      parsed.foreach(raw => returned.add(if (encoding != null) new InternetAddress(raw.getAddress(), raw.getPersonal(), encoding) else raw))
-      returned
+      var returned = new mutable.ArrayBuffer[InternetAddress]
+      parsed.foreach(raw => returned.addOne(if (encoding != null) new InternetAddress(raw.getAddress(), raw.getPersonal(), encoding) else raw))
+      returned.toList
     } catch {
-      case ex: Exception => throw new RuntimeException("Failed to parse embedded personal name to correct encoding", ex)
+      case ex: Exception =>
+        throw new RuntimeException("Failed to parse embedded personal name to correct encoding", ex)
+        List.empty
     }
   }
 }

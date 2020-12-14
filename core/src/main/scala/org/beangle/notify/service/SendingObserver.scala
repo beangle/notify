@@ -16,29 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.mail
+package org.beangle.notify.service
 
-import java.util.List
-import javax.mail.internet.InternetAddress
-import scala.collection.JavaConversions._
-import org.scalatest.FunSpec
-import org.scalatest.Matchers
+import org.beangle.notify.Message
 
-class MimeUtilsTest extends FunSpec with Matchers {
+trait SendingObserver {
 
-  describe("MimeUtils") {
-    it("testParseAddress") {
-      var me = "段体华<duantihua@gmail.com>,程序员<programer@gmail.com>"
-      var adds = MimeUtils.parseAddress(me, "UTF-8")
-      var i = 0
-      for (add <- adds) {
-        if (i == 0) {
-          add.getPersonal() should equal("段体华")
-        } else {
-          add.getPersonal() should equal("程序员")
-        }
-        i += 1
-      }
-    }
-  }
+  def onStart(msg: Message):Unit
+
+  def onFinish(msg: Message):Unit
 }

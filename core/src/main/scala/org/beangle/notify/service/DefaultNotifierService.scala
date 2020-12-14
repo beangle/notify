@@ -16,19 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.mail
+package org.beangle.notify.service
 
-import org.beangle.commons.message.Message
-import scala.collection.JavaConversions._
+import org.beangle.notify.Notifier
+import scala.collection.mutable
 
-class DefaultMailNotifier[T <: MailMessage] extends AbstractMailNotifier[T] {
+trait DefaultNotifierService extends NotifierService {
 
-  def this(mailSender: MailSender) {
-    this()
-    this.mailSender = mailSender
-  }
+  var notifiers: mutable.Map[String, Notifier[_]] = _
 
-  protected def buildSubject(context: Message): String = context.getSubject
+  def getNotifier(notifierId: String): Notifier[_] = notifiers.get(notifierId).orNull
 
-  protected def buildText(context: Message): String = context.getText
 }

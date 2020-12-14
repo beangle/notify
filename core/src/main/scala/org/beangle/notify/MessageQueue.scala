@@ -16,17 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.service
+package org.beangle.notify
 
-import org.beangle.commons.message.Notifier
-//remove if not needed
-import scala.collection.JavaConversions._
+import java.util.List
 
-trait NotifierService {
-  /**
-   * Returns notifier by id
-   *
-   * @param notifierId
-   */
-  def getNotifier(notifierId: String): Notifier[_]
+
+/**
+ * 消息队列
+ */
+trait MessageQueue[T <: Message] {
+
+  def size(): Int
+
+  def poll(): T
+
+  def getMessages(): List[T]
+
+  def addMessages(contexts: List[T]): Unit
+
+  def addMessage(message: T): Unit
+
 }

@@ -16,41 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.service
+package org.beangle.notify.service
 
 import org.beangle.commons.logging.Logging
-import org.beangle.commons.message.NotificationTask
-import org.beangle.commons.message.Message
-import org.beangle.commons.message.MessageQueue
-import scala.beans.BeanProperty
-import org.beangle.commons.message.Notifier
-import org.beangle.commons.message.NotificationException
-//remove if not needed
-import scala.collection.JavaConversions._
+import org.beangle.notify.NotificationTask
+import org.beangle.notify.Message
+import org.beangle.notify.MessageQueue
+import org.beangle.notify.Notifier
+import org.beangle.notify.NotificationException
 
-class DefaultNotificationTask[T <: Message] extends NotificationTask[T] with Logging {
+class DefaultNotificationTask[T <: Message](val notifier: Notifier[T], val queue: MessageQueue[T] = new DefaultMessageQueue[T])
+  extends NotificationTask[T] with Logging {
 
-  private var queue: MessageQueue[T] = new DefaultMessageQueue[T]
-
-  private var notifier: Notifier[T] = _
-
-  private var observer: SendingObserver = _
+  var observer: SendingObserver = _
 
   private var taskInterval: Long = 0
 
-  def getMessageQueue(): MessageQueue[T] = queue
-
-  def setMessageQueue(messageQueue: MessageQueue[T]) {
-    this.queue = messageQueue
-  }
-
-  def getNotifier(): Notifier[T] = notifier
-
-  def setNotifier(notifier: Notifier[T]) {
-    this.notifier = notifier
-  }
-
-  def send() {
+  def send(): Unit = {
     var msg = queue.poll()
     while (null != msg) {
       try {
@@ -64,10 +46,6 @@ class DefaultNotificationTask[T <: Message] extends NotificationTask[T] with Log
       if (null != observer) observer.onFinish(msg)
       msg = queue.poll()
     }
-  }
-
-  def setObserver(observer: SendingObserver) {
-    this.observer = observer
   }
 
 }

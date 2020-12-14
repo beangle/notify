@@ -16,11 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message
+package org.beangle.notify.mail
 
-//remove if not needed
-import scala.collection.JavaConversions._
+import org.beangle.notify.Message
 
-@SerialVersionUID(1L)
-class NotificationException(message: String, cause: Throwable) extends RuntimeException(message, cause) {
+class DefaultMailNotifier[T <: MailMessage](mailSender: MailSender, from: String)
+  extends AbstractMailNotifier[T](mailSender, from) {
+
+  protected def buildSubject(context: Message): String = context.subject
+
+  protected def buildText(context: Message): String = context.text
 }

@@ -16,17 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.service
+package org.beangle.notify.service
 
 import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.ServerSetupTest
-import org.beangle.commons.message.mail.JavaMailSender
-import org.beangle.commons.message.mail.DefaultMailNotifier
-import org.beangle.commons.message.mail.MailMessage
+import org.beangle.notify.mail.JavaMailSender
+import org.beangle.notify.mail.DefaultMailNotifier
+import org.beangle.notify.mail.MailMessage
 import javax.mail.MessagingException
 import org.beangle.commons.lang.Throwables
-//remove if not needed
-import scala.collection.JavaConversions._
+
+
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 

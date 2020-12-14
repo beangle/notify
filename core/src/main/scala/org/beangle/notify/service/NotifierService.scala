@@ -16,9 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.mail
+package org.beangle.notify.service
 
-trait MailSender {
+import org.beangle.notify.Notifier
 
-  def send(message: MailMessage*)
+trait NotifierService {
+  /**
+   * Returns notifier by id
+   *
+   * @param notifierId
+   */
+  def getNotifier(notifierId: String): Notifier[_]
 }

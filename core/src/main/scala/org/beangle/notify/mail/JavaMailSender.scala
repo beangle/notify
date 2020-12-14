@@ -16,16 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.mail
+package org.beangle.notify.mail
 
 import scala.collection.Seq
-import scala.beans.BeanProperty
-import scala.collection.JavaConversions._
-
-import java.util.LinkedHashMap
+import scala.collection.mutable
 import java.io.UnsupportedEncodingException
-import java.util.Date
 import java.util.Properties
+import java.{util => ju}
 
 import javax.mail.Session
 import javax.mail.MessagingException
@@ -38,8 +35,8 @@ import javax.mail.AuthenticationFailedException
 import org.beangle.commons.lang.Strings
 import org.beangle.commons.lang.Throwables
 import org.beangle.commons.logging.Logging
-import org.beangle.commons.message.NotificationException
-import org.beangle.commons.message.NotificationSendException
+import org.beangle.notify.NotificationException
+import org.beangle.notify.NotificationSendException
 
 object JavaMailSender {
 
@@ -47,38 +44,32 @@ object JavaMailSender {
 }
 
 import JavaMailSender._
+
 class JavaMailSender extends MailSender with Logging {
 
-  @BeanProperty
   var javaMailProperties: Properties = new Properties()
 
-  var session: Session = _
+  private var session: Session = _
 
-  @BeanProperty
   var protocol: String = "smtp"
 
-  @BeanProperty
   var host: String = _
 
-  @BeanProperty
   var port: Int = -1
 
-  @BeanProperty
   var username: String = _
 
-  @BeanProperty
   var password: String = _
 
-  @BeanProperty
   var defaultEncoding: String = _
 
-  def send(messages: MailMessage*) {
+  def send(messages: MailMessage*): Unit = {
     var mimeMsgs = new java.util.ArrayList[MimeMessage]()
     for (m <- messages) {
       try {
         mimeMsgs.add(createMimeMessage(m))
       } catch {
-        case e: MessagingException => logger.error("Cannot mapping message" + m.getSubject(), e)
+        case e: MessagingException => logger.error("Cannot mapping message" + m.subject, e)
       }
     }
     doSend(mimeMsgs.toArray(new Array[MimeMessage](mimeMsgs.size)))
@@ -87,21 +78,18 @@ class JavaMailSender extends MailSender with Logging {
   protected def createMimeMessage(mailMsg: MailMessage): MimeMessage = {
     var mimeMsg = new MimeMessage(getSession())
 
-    mimeMsg.setSentDate(if (null == mailMsg.getSentAt()) new Date() else mailMsg.getSentAt())
-    if (null != mailMsg.getFrom()) mimeMsg.setFrom(mailMsg.getFrom())
+    mimeMsg.setSentDate(if (null == mailMsg.sentAt) new ju.Date() else ju.Date.from(mailMsg.sentAt))
+    if (null != mailMsg.from) mimeMsg.setFrom(mailMsg.from)
+    addRecipient(mimeMsg, mailMsg)
+
+    var encoding = Strings.substringAfter(mailMsg.contentType, "charset=")
     try {
-      addRecipient(mimeMsg, mailMsg)
-    } catch {
-      case e: MessagingException => Throwables.propagate(e)
-    }
-    var encoding = Strings.substringAfter(mailMsg.getContentType(), "charset=")
-    try {
-      mimeMsg.setSubject(MimeUtility.encodeText(mailMsg.getSubject(), encoding, "B"))
+      mimeMsg.setSubject(MimeUtility.encodeText(mailMsg.subject, encoding, "B"))
     } catch {
       case e: UnsupportedEncodingException => Throwables.propagate(e)
     }
-    val text = mailMsg.getText()
-    if (Strings.contains(mailMsg.getContentType(), "html")) {
+    val text = mailMsg.text
+    if (Strings.contains(mailMsg.contentType, "html")) {
       mimeMsg.setContent(text, if (Strings.isEmpty(encoding)) "text/html" else "text/htmlcharset=" + encoding)
     } else {
       mimeMsg.setText(text, if (Strings.isEmpty(encoding)) null else encoding)
@@ -117,21 +105,21 @@ class JavaMailSender extends MailSender with Logging {
   }
 
   protected def getTransport(session: Session): Transport = {
-    var protocol = getProtocol()
-    if (protocol == null) protocol = session.getProperty("mail.transport.protocol")
+    var pro = this.protocol
+    if (pro == null) pro = session.getProperty("mail.transport.protocol")
     try {
-      session.getTransport(protocol)
+      session.getTransport(pro)
     } catch {
       case e: NoSuchProviderException => throw e
     }
   }
 
-  protected def doSend(mimeMessages: Array[MimeMessage]) {
-    var failedMessages = new LinkedHashMap[Object, Exception]
+  protected def doSend(mimeMessages: Array[MimeMessage]) : Unit ={
+    var failedMessages = new mutable.LinkedHashMap[Object, Exception]
     var transport: Transport = null
     try {
       transport = getTransport(getSession())
-      transport.connect(getHost(), getPort(), getUsername(), getPassword())
+      transport.connect(host, port, username, password)
     } catch {
       case ex: AuthenticationFailedException => throw new NotificationException(ex.getMessage(), ex)
       case ex: MessagingException =>
@@ -142,7 +130,7 @@ class JavaMailSender extends MailSender with Logging {
     try {
       for (mimeMessage <- mimeMessages) {
         try {
-          if (mimeMessage.getSentDate() == null) mimeMessage.setSentDate(new Date())
+          if (mimeMessage.getSentDate() == null) mimeMessage.setSentDate(new ju.Date())
           var messageId = mimeMessage.getMessageID()
           mimeMessage.saveChanges()
           // Preserve explicitly specified message id...
@@ -157,33 +145,36 @@ class JavaMailSender extends MailSender with Logging {
         transport.close()
       } catch {
         case ex: MessagingException =>
-          throw if (!failedMessages.isEmpty()) new NotificationSendException("Failed to close server connection after message failures", ex,
-            failedMessages)
+          throw if (failedMessages.nonEmpty) new NotificationSendException("Failed to close server connection after message failures", ex,
+            failedMessages.toMap)
           else throw new NotificationException("Failed to close server connection after message sending", ex)
       }
     }
 
-    if (!failedMessages.isEmpty()) { throw new NotificationSendException(failedMessages) }
+    if (failedMessages.nonEmpty) {
+      throw new NotificationSendException(failedMessages.toMap)
+    }
   }
 
   private def addRecipient(mimeMsg: MimeMessage, mailMsg: MailMessage): Int = {
     var recipients = 0
     try {
-      for (to <- mailMsg.getTo()) {
+      for (to <- mailMsg.to) {
         mimeMsg.addRecipient(javax.mail.Message.RecipientType.TO, to)
         recipients += 1
       }
-      for (cc <- mailMsg.getCc()) {
+      for (cc <- mailMsg.cc) {
         mimeMsg.addRecipient(javax.mail.Message.RecipientType.CC, cc)
         recipients += 1
       }
-      for (bcc <- mailMsg.getBcc()) {
+      for (bcc <- mailMsg.bcc) {
         mimeMsg.addRecipient(javax.mail.Message.RecipientType.BCC, bcc)
         recipients += 1
       }
-    } catch { case e: MessagingException => Throwables.propagate(e) }
+    } catch {
+      case e: MessagingException => Throwables.propagate(e)
+    }
     return recipients
   }
 
-  def setSession(session: Session) { this.session = session }
 }

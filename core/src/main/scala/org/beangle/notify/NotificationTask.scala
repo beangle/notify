@@ -16,35 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message
+package org.beangle.notify
 
-import java.util.List
-import java.util.Properties
-import Message._
-//remove if not needed
-import scala.collection.JavaConversions._
+/**
+ * 消息通知任务
+ */
+trait NotificationTask[T <: Message] {
 
-object Message {
-  val TEXT = "text/plain charset=UTF-8"
+  def notifier: Notifier[T]
 
-  val HTML = "text/html charset=UTF-8"
-}
+  def queue: MessageQueue[T]
 
-trait Message {
+  def send(): Unit
 
-  def getSubject(): String
-
-  def setSubject(subject: String): Unit
-
-  def getText(): String
-
-  def setText(text: String): Unit
-
-  def getProperties(): Properties
-
-  def getRecipients(): List[String]
-
-  def getContentType(): String
-
-  def setContentType(contentType: String): Unit
 }

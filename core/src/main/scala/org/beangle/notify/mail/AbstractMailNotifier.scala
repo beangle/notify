@@ -16,34 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.mail
+package org.beangle.notify.mail
 
-import org.beangle.commons.message.Notifier
-import scala.collection.JavaConversions._
-import org.beangle.commons.message.Message
+import org.beangle.notify.Notifier
+
+import org.beangle.notify.Message
 import org.beangle.commons.lang.Assert
 import org.beangle.commons.lang.Strings
-import org.beangle.commons.message.NotificationException
+import org.beangle.notify.NotificationException
 import org.beangle.commons.lang.Throwables
 import org.beangle.commons.logging.Logging
 
-abstract class AbstractMailNotifier[T <: MailMessage] extends Notifier[T] with Logging {
-
-  protected var mailSender: MailSender = _
-
-  private var from: String = _
+abstract class AbstractMailNotifier[T <: MailMessage](val mailSender: MailSender,val from: String) extends Notifier[T] with Logging {
 
   def getType(): String = "mail"
 
-  def deliver(msg: T) {
+  def deliver(msg: T): Unit = {
     beforeSend(msg)
     try {
-      if (null == msg.getFrom() && null != getFrom()) msg.from(getFrom())
+      if (null == msg.from && null != from) {
+        msg.from(from)
+      }
       mailSender.send(msg)
       afterSend(msg)
     } catch {
       case e: NotificationException =>
-        logger.error("Cannot send message " + msg.getSubject(), e)
+        logger.error("Cannot send message " + msg.subject, e)
         Throwables.propagate(e)
     }
   }
@@ -52,20 +50,7 @@ abstract class AbstractMailNotifier[T <: MailMessage] extends Notifier[T] with L
 
   protected def buildText(msg: Message): String
 
-  protected def beforeSend(msg: Message) {}
+  protected def beforeSend(msg: Message): Unit = {}
 
-  protected def afterSend(msg: Message) {}
-
-  def getMailSender(): MailSender = this.mailSender
-
-  def setMailSender(mailSender: MailSender) {
-    this.mailSender = mailSender
-  }
-
-  def getFrom(): String = this.from
-
-  def setFrom(from: String) {
-    Assert.notEmpty(from)
-    this.from = from
-  }
+  protected def afterSend(msg: Message): Unit = {}
 }

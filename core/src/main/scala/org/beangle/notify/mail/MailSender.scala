@@ -16,15 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.service
+package org.beangle.notify.mail
 
-import org.beangle.commons.message.Message
-//remove if not needed
-import scala.collection.JavaConversions._
+trait MailSender {
 
-trait SendingObserver {
-
-  def onStart(msg: Message)
-
-  def onFinish(msg: Message)
+  def send(message: MailMessage*): Unit
 }

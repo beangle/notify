@@ -16,11 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.mail
+package org.beangle.notify.mail
 
 import java.lang.Boolean
-//remove if not needed
-import scala.collection.JavaConversions._
+
+
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 

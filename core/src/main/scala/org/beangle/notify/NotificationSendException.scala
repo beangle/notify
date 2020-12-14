@@ -16,18 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.commons.message.service
+package org.beangle.notify
 
-import org.beangle.commons.message.Notifier
-import scala.collection.JavaConversions._
-import scala.beans.BeanProperty
-import java.util.Map
+import scala.collection.immutable.Map
 
-trait DefaultNotifierService extends NotifierService {
+class NotificationSendException(message: String, cause: Throwable) extends NotificationException(message, cause) {
 
-  @BeanProperty
-  var notifiers: Map[String, Notifier[_]] = _
+  var failedMessages: Map[Object, Exception] = _
 
-  def getNotifier(notifierId: String): Notifier[_] = notifiers.get(notifierId)
+  def this(message: String, cause: Throwable, failedMessages: Map[Object, Exception]) = {
+    this(message, cause)
+    this.failedMessages = failedMessages
+  }
+
+  def this(failedMessages: Map[Object, Exception]) = {
+    this(null, null, failedMessages)
+  }
 
 }
