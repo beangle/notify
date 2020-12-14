@@ -20,8 +20,8 @@ package org.beangle.notify.mail
 
 import org.beangle.notify.Message
 
-class DefaultMailNotifier[T <: MailMessage](mailSender: MailSender, from: String)
-  extends AbstractMailNotifier[T](mailSender, from) {
+class DefaultMailNotifier(mailSender: MailSender, from: String)
+  extends AbstractMailNotifier(mailSender, from) {
 
   protected def buildSubject(context: Message): String = context.subject
 

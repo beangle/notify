@@ -30,9 +30,9 @@ object Dependencies {
   val logbackClassic = "ch.qos.logback" % "logback-classic" % logbackVer % "test"
   val logbackCore = "ch.qos.logback" % "logback-core" % logbackVer % "test"
 
-  val javamail = "jakarta.mail" % "jakarta.mail-api" % "2.0.0"
-  val sunmail = "com.sun.mail" % "jakarta.mail" % "2.0.0"
-  val greenmail = "com.icegreen" % "greenmail" % "1.6.1"
+  val jakartamail = "jakarta.mail" % "jakarta.mail-api" % "1.6.5"
+  val sunmail = "com.sun.mail" % "jakarta.mail" % "1.6.5"
+  val greenmail = "com.icegreen" % "greenmail" % "1.6.1" % "test"
 
   val commonDeps = Seq(slf4j, logbackClassic, logbackCore, commonsCore, scalatest)
 }

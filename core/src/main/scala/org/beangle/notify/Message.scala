@@ -18,12 +18,12 @@
  */
 package org.beangle.notify
 
-import java.util.{Properties}
+import java.util.Properties
 
 object Message {
-  val TEXT = "text/plain charset=UTF-8"
+  val TEXT = "text/plain; charset=UTF-8"
 
-  val HTML = "text/html charset=UTF-8"
+  val HTML = "text/html; charset=UTF-8"
 }
 
 trait Message {

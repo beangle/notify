@@ -18,22 +18,17 @@
  */
 package org.beangle.notify
 
-import java.util.List
-
-
 /**
  * 消息队列
  */
-trait MessageQueue[T <: Message] {
+trait MessageQueue {
 
   def size(): Int
 
-  def poll(): T
+  def poll(): Message
 
-  def getMessages(): List[T]
+  def addMessages(contexts: Iterable[Message]): Unit
 
-  def addMessages(contexts: List[T]): Unit
-
-  def addMessage(message: T): Unit
+  def addMessage(message: Message): Unit
 
 }

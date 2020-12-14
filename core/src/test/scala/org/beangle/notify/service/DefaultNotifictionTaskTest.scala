@@ -26,12 +26,11 @@ import org.beangle.notify.mail.MailMessage
 import javax.mail.MessagingException
 import org.beangle.commons.lang.Throwables
 
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-import org.scalatest.FunSpec
-import org.scalatest.Matchers
-
-class DefaultNotifictionTaskTest extends FunSpec with Matchers {
-  private var greenMail = new GreenMail(ServerSetupTest.ALL)
+class DefaultNotifictionTaskTest extends AnyFunSpec with Matchers {
+  private val greenMail = new GreenMail(ServerSetupTest.ALL)
   greenMail.start()
   greenMail.setUser("test1@localhost", "user1", "password")
   greenMail.setUser("test2@localhost", "user2", "password")
@@ -39,20 +38,18 @@ class DefaultNotifictionTaskTest extends FunSpec with Matchers {
   describe("JavaMailSender") {
     it("testMail") {
       try {
-        var mailSender = new JavaMailSender()
-        mailSender.setHost("localhost")
-        mailSender.setUsername("user1")
-        mailSender.setPassword("password")
-        mailSender.setPort(3025)
+        val mailSender = new JavaMailSender()
+        mailSender.host = "localhost"
+        mailSender.username= "user1"
+        mailSender.password = "password"
+        mailSender.port = 3025
 
-        var notifier = new DefaultMailNotifier[MailMessage](mailSender)
-        notifier.setFrom("测试name<user1@localhost>")
-        var task = new DefaultNotificationTask[MailMessage]()
-        task.setNotifier(notifier)
-        var mmc = new MailMessage("测试", "测试简单邮件发送机制", "user2@localhost")
-        task.getMessageQueue().addMessage(mmc)
+        val notifier = new DefaultMailNotifier(mailSender,"测试name<user1@localhost>")
+        val task = new DefaultNotificationTask(notifier)
+        val mmc = new MailMessage("测试", "测试简单邮件发送机制", "user2@localhost")
+        task.queue.addMessage(mmc)
         task.send()
-        var msgs = greenMail.getReceivedMessages()
+        val msgs = greenMail.getReceivedMessages()
         msgs.length should be(1)
         greenMail.stop()
       } catch {

@@ -21,11 +21,11 @@ package org.beangle.notify
 /**
  * 消息通知任务
  */
-trait NotificationTask[T <: Message] {
+trait NotificationTask {
 
-  def notifier: Notifier[T]
+  def notifier: Notifier
 
-  def queue: MessageQueue[T]
+  def queue: MessageQueue
 
   def send(): Unit
 

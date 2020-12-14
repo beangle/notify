@@ -21,10 +21,10 @@ package org.beangle.notify.mail
 import java.util.List
 import javax.mail.internet.InternetAddress
 
-import org.scalatest.FunSpec
-import org.scalatest.Matchers
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class MimeUtilsTest extends FunSpec with Matchers {
+class MimeUtilsTest extends AnyFunSpec with Matchers {
 
   describe("MimeUtils") {
     it("testParseAddress") {

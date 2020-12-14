@@ -18,28 +18,23 @@
  */
 package org.beangle.notify.service
 
-import org.beangle.notify.MessageQueue
-import org.beangle.notify.Message
-import java.util.Queue
 import java.util.concurrent.LinkedBlockingQueue
-import java.util.List
 
+import org.beangle.notify.{Message, MessageQueue}
 
-class DefaultMessageQueue[T <: Message] extends MessageQueue[T] {
+class DefaultMessageQueue extends MessageQueue {
 
-  private var queue: Queue[T] = new LinkedBlockingQueue[T]
+  private val queue = new LinkedBlockingQueue[Message]
 
-  def getMessages(): List[T] = new java.util.ArrayList[T](queue)
-
-  def addMessage(message: T): Unit = {
+  def addMessage(message: Message): Unit = {
     queue.add(message)
   }
 
-  def addMessages(contexts: List[T]): Unit = {
-    queue.addAll(contexts)
+  def addMessages(contexts: Iterable[Message]): Unit = {
+    contexts foreach addMessage
   }
 
-  def poll(): T = queue.poll()
+  def poll(): Message = queue.poll()
 
   def size(): Int = queue.size()
 }

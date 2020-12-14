@@ -18,31 +18,30 @@
  */
 package org.beangle.notify.mail
 
-import org.beangle.notify.Notifier
-
-import org.beangle.notify.Message
-import org.beangle.commons.lang.Assert
-import org.beangle.commons.lang.Strings
-import org.beangle.notify.NotificationException
 import org.beangle.commons.lang.Throwables
 import org.beangle.commons.logging.Logging
+import org.beangle.notify.{Message, NotificationException, Notifier}
 
-abstract class AbstractMailNotifier[T <: MailMessage](val mailSender: MailSender,val from: String) extends Notifier[T] with Logging {
+abstract class AbstractMailNotifier(val mailSender: MailSender, val from: String) extends Notifier with Logging {
 
-  def getType(): String = "mail"
+  override def getType: String = "mail"
 
-  def deliver(msg: T): Unit = {
-    beforeSend(msg)
-    try {
-      if (null == msg.from && null != from) {
-        msg.from(from)
-      }
-      mailSender.send(msg)
-      afterSend(msg)
-    } catch {
-      case e: NotificationException =>
-        logger.error("Cannot send message " + msg.subject, e)
-        Throwables.propagate(e)
+  override def deliver(message: Message): Unit = {
+    message match {
+      case msg: MailMessage =>
+        beforeSend(msg)
+        try {
+          if (null == msg.from && null != from) {
+            msg.from(from)
+          }
+          mailSender.send(msg)
+          afterSend(msg)
+        } catch {
+          case e: NotificationException =>
+            logger.error("Cannot send message " + msg.subject, e)
+            Throwables.propagate(e)
+        }
+      case _ => logger.warn("Mail Notifier should deliver mail message only")
     }
   }
 

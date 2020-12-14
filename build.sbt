@@ -18,6 +18,7 @@ lazy val core = (project in file("core"))
   .settings(
     name := "beangle-notify-core",
     commonSettings,
-    libraryDependencies ++= commonDeps
+    libraryDependencies ++= (commonDeps),
+    libraryDependencies ++= Seq(jakartamail,sunmail,greenmail)
   )
 

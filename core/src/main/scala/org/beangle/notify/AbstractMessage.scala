@@ -30,5 +30,4 @@ abstract class AbstractMessage extends Message {
 
   var contentType: String = Message.TEXT
 
-  // Assert.isTrue(Strings.contains(contentType, "charset="), "contentType should contain charset")
 }

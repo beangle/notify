@@ -19,14 +19,10 @@
 package org.beangle.notify.service
 
 import org.beangle.commons.logging.Logging
-import org.beangle.notify.NotificationTask
-import org.beangle.notify.Message
-import org.beangle.notify.MessageQueue
-import org.beangle.notify.Notifier
-import org.beangle.notify.NotificationException
+import org.beangle.notify.{MessageQueue, NotificationException, NotificationTask, Notifier}
 
-class DefaultNotificationTask[T <: Message](val notifier: Notifier[T], val queue: MessageQueue[T] = new DefaultMessageQueue[T])
-  extends NotificationTask[T] with Logging {
+class DefaultNotificationTask(val notifier: Notifier, val queue: MessageQueue = new DefaultMessageQueue)
+  extends NotificationTask with Logging {
 
   var observer: SendingObserver = _
 

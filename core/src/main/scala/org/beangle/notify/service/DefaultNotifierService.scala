@@ -23,8 +23,8 @@ import scala.collection.mutable
 
 trait DefaultNotifierService extends NotifierService {
 
-  var notifiers: mutable.Map[String, Notifier[_]] = _
+  var notifiers: mutable.Map[String, Notifier] = _
 
-  def getNotifier(notifierId: String): Notifier[_] = notifiers.get(notifierId).orNull
+  def getNotifier(notifierId: String): Notifier = notifiers.get(notifierId).orNull
 
 }

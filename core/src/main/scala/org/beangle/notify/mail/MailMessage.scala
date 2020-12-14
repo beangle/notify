@@ -23,6 +23,7 @@ import org.beangle.commons.lang.Assert
 import org.beangle.commons.lang.Strings
 import org.beangle.commons.collection.Collections
 import org.beangle.notify.AbstractMessage
+import org.beangle.notify.Message
 import javax.mail.internet.InternetAddress
 import scala.collection.mutable
 
@@ -55,15 +56,15 @@ class MailMessage extends AbstractMessage {
     this.to = MimeUtils.parseAddress(sendTo, encoding)
     this.subject = subject
     this.text = text
+    if(text.startsWith("<!DOCTYPE html>")){
+      this.contentType=Message.HTML
+    }
   }
 
   def this(subject: String, text: String, sendTo: String, sendCc: String, sendBcc: String) = {
-    this()
-    this.to = MimeUtils.parseAddress(sendTo, encoding)
+    this(subject,text,sendTo)
     this.cc = MimeUtils.parseAddress(sendCc, encoding)
     this.bcc = MimeUtils.parseAddress(sendBcc, encoding)
-    this.subject = subject
-    this.text = text
   }
 
   def from(from: String): MailMessage = {

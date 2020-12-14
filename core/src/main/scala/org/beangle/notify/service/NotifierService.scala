@@ -26,5 +26,5 @@ trait NotifierService {
    *
    * @param notifierId
    */
-  def getNotifier(notifierId: String): Notifier[_]
+  def getNotifier(notifierId: String): Notifier
 }

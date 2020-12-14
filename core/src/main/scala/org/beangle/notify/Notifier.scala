@@ -18,13 +18,10 @@
  */
 package org.beangle.notify
 
+trait Notifier {
 
+  def getType: String
 
-
-trait Notifier[T <: Message] {
-
-  def getType(): String
-
-  def deliver(message: T): Unit
+  def deliver(message: Message): Unit
 
 }
