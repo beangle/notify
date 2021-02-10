@@ -56,13 +56,13 @@ class MailMessage extends AbstractMessage {
     this.to = MimeUtils.parseAddress(sendTo, encoding)
     this.subject = subject
     this.text = text
-    if(text.startsWith("<!DOCTYPE html>")){
-      this.contentType=Message.HTML
+    if (text.startsWith("<!DOCTYPE html>")) {
+      this.contentType = Message.HTML
     }
   }
 
   def this(subject: String, text: String, sendTo: String, sendCc: String, sendBcc: String) = {
-    this(subject,text,sendTo)
+    this(subject, text, sendTo)
     this.cc = MimeUtils.parseAddress(sendCc, encoding)
     this.bcc = MimeUtils.parseAddress(sendBcc, encoding)
   }

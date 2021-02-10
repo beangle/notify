@@ -22,6 +22,8 @@ trait Notifier {
 
   def getType: String
 
-  def deliver(message: Message): Unit
+  def deliver(message: Message, observer: SendingObserver): Unit
+
+  def deliver(messages: Iterable[Message], observer: SendingObserver): Unit
 
 }

@@ -18,19 +18,6 @@
  */
 package org.beangle.notify
 
-import scala.collection.immutable.Map
-
-class NotificationSendException(message: String, cause: Throwable) extends NotificationException(message, cause) {
-
-  var failedMessages: Map[Object, Exception] = _
-
-  def this(message: String, cause: Throwable, failedMessages: Map[Object, Exception]) = {
-    this(message, cause)
-    this.failedMessages = failedMessages
-  }
-
-  def this(failedMessages: Map[Object, Exception]) = {
-    this(null, null, failedMessages)
-  }
-
+@SerialVersionUID(1L)
+class NotifyException(message: String, cause: Throwable) extends RuntimeException(message, cause) {
 }

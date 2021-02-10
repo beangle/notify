@@ -20,7 +20,7 @@ package org.beangle.notify.service
 
 import java.util.concurrent.LinkedBlockingQueue
 
-import org.beangle.notify.{Message, MessageQueue}
+import org.beangle.notify.{ Message, MessageQueue }
 
 class DefaultMessageQueue extends MessageQueue {
 

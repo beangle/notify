@@ -19,27 +19,15 @@
 package org.beangle.notify.service
 
 import org.beangle.commons.logging.Logging
-import org.beangle.notify.{MessageQueue, NotificationException, NotificationTask, Notifier}
+import org.beangle.notify.{ MessageQueue, Notifier, SendingObserver }
 
 class DefaultNotificationTask(val notifier: Notifier, val queue: MessageQueue = new DefaultMessageQueue)
   extends NotificationTask with Logging {
 
-  var observer: SendingObserver = _
-
-  private var taskInterval: Long = 0
-
-  def send(): Unit = {
+  def send(observer: SendingObserver): Unit = {
     var msg = queue.poll()
     while (null != msg) {
-      try {
-        if (null != observer) observer.onStart(msg)
-        notifier.deliver(msg)
-        if (taskInterval > 0) Thread.sleep(taskInterval)
-      } catch {
-        case e: NotificationException => logger.error("send error", e)
-        case e: InterruptedException => logger.error("send error", e)
-      }
-      if (null != observer) observer.onFinish(msg)
+      notifier.deliver(msg, observer)
       msg = queue.poll()
     }
   }

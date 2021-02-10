@@ -1,7 +1,7 @@
-import scala.concurrent.duration._
 import Dependencies._
 import BuildSettings._
-// factor out common settings
+import scalariform.formatter.preferences._
+
 ThisBuild / organization := "org.beangle.notify"
 ThisBuild / organizationName  := "Beangle"
 ThisBuild / startYear := Some(2015)
@@ -24,4 +24,6 @@ lazy val core = (project in file("core"))
     libraryDependencies ++= (commonDeps),
     libraryDependencies ++= Seq(jakartamail,sunmail,greenmail)
   ).enablePlugins(AutomateHeaderPlugin)
+
+publish / skip := true
 

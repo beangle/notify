@@ -18,7 +18,11 @@
  */
 package org.beangle.notify.mail
 
+import org.beangle.notify.SendingObserver
+
 trait MailSender {
 
-  def send(message: MailMessage*): Unit
+  def send(message: MailMessage, observer: SendingObserver): Unit
+
+  def send(message: Iterable[MailMessage], observer: SendingObserver): Unit
 }

@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.notify
+package org.beangle.notify.service
+
+import org.beangle.notify.{ MessageQueue, Notifier, SendingObserver }
 
 /**
  * 消息通知任务
@@ -27,6 +29,6 @@ trait NotificationTask {
 
   def queue: MessageQueue
 
-  def send(): Unit
+  def send(observer: SendingObserver): Unit
 
 }

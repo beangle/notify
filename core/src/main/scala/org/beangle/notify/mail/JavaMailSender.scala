@@ -20,16 +20,16 @@ package org.beangle.notify.mail
 
 import java.io.UnsupportedEncodingException
 import java.util.Properties
-import java.{util => ju}
+import java.{ util => ju }
 
 import com.sun.mail.util.MailSSLSocketFactory
-import javax.mail.internet.{MimeMessage, MimeUtility}
-import javax.mail.{AuthenticationFailedException, MessagingException, NoSuchProviderException, Session, Transport}
-import org.beangle.commons.lang.{Strings, Throwables}
+import javax.mail.internet.{ MimeMessage, MimeUtility }
+import javax.mail.{ MessagingException, NoSuchProviderException, Session, Transport }
+import org.beangle.commons.lang.{ Strings, Throwables }
 import org.beangle.commons.logging.Logging
-import org.beangle.notify.{NotificationException, NotificationSendException}
+import org.beangle.notify.{ NotifyException, SendingObserver }
 
-import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 object JavaMailSender {
 
@@ -48,6 +48,9 @@ object JavaMailSender {
     sender.properties.put("mail.smtp.timeout", "465")
     sender.properties.put("mail.smtp.port", Integer.valueOf(port))
     sender.properties.put("mail.smtp.starttls.enable", "true")
+    sender.properties.put("mail.smtp.timeout", 10000);
+    sender.properties.put("mail.smtp.connectiontimeout", 10000);
+    sender.properties.put("mail.smtp.writetimeout", 10000);
     val sf = new MailSSLSocketFactory()
     sf.setTrustAllHosts(true)
     sender.properties.put("mail.smtp.socketFactory", sf)
@@ -73,28 +76,34 @@ class JavaMailSender extends MailSender with Logging {
 
   var defaultEncoding: String = _
 
+  var sendInterval: Long = 0
+
   private var session: Session = _
 
-  def send(messages: MailMessage*): Unit = {
-    var mimeMsgs = new java.util.ArrayList[MimeMessage]()
+  override def send(msg: MailMessage, observer: SendingObserver): Unit = {
+    send(List(msg), observer)
+  }
+
+  override def send(messages: Iterable[MailMessage], observer: SendingObserver): Unit = {
+    val mimeMsgs = new ArrayBuffer[(MailMessage, MimeMessage)]
     for (m <- messages) {
       try {
-        mimeMsgs.add(createMimeMessage(m))
+        mimeMsgs.addOne((m, createMimeMessage(m)))
       } catch {
-        case e: MessagingException => logger.error("Cannot mapping message" + m.subject, e)
+        case e: MessagingException => observer.onFail(new NotifyException("Cannot mapping message" + m.subject, e))
       }
     }
-    doSend(mimeMsgs.toArray(new Array[MimeMessage](mimeMsgs.size)))
+    doSend(mimeMsgs, observer)
   }
 
   protected def createMimeMessage(mailMsg: MailMessage): MimeMessage = {
-    var mimeMsg = new MimeMessage(getSession())
+    val mimeMsg = new MimeMessage(getSession())
 
     mimeMsg.setSentDate(if (null == mailMsg.sentAt) new ju.Date() else ju.Date.from(mailMsg.sentAt))
     if (null != mailMsg.from) mimeMsg.setFrom(mailMsg.from)
     addRecipient(mimeMsg, mailMsg)
 
-    var encoding = Strings.substringAfter(mailMsg.contentType, "charset=")
+    val encoding = Strings.substringAfter(mailMsg.contentType, "charset=")
     try {
       mimeMsg.setSubject(MimeUtility.encodeText(mailMsg.subject, encoding, "B"))
     } catch {
@@ -126,45 +135,39 @@ class JavaMailSender extends MailSender with Logging {
     }
   }
 
-  protected def doSend(mimeMessages: Array[MimeMessage]): Unit = {
-    var failedMessages = new mutable.LinkedHashMap[Object, Exception]
+  protected def doSend(msgs: Iterable[(MailMessage, MimeMessage)], observer: SendingObserver): Unit = {
     var transport: Transport = null
     try {
       transport = getTransport(getSession())
       transport.connect(host, port, username, password)
     } catch {
-      case ex: AuthenticationFailedException => throw new NotificationException(ex.getMessage(), ex)
-      case ex: MessagingException =>
-        // Effectively, all messages failed...
-        mimeMessages.foreach(original => failedMessages.put(original, ex))
-        throw new NotificationException("Mail server connection failed", ex)
+      case ex: Exception => observer.onFail(ex)
     }
-    try {
-      for (mimeMessage <- mimeMessages) {
+    if (null != transport) {
+      try {
+        for (msg <- msgs) {
+          val mimeMessage = msg._2
+          try {
+            if (mimeMessage.getSentDate() == null) mimeMessage.setSentDate(new ju.Date())
+            val messageId = mimeMessage.getMessageID()
+            mimeMessage.saveChanges()
+            // Preserve explicitly specified message id...
+            if (messageId != null) mimeMessage.setHeader(HEADER_MESSAGE_ID, messageId)
+            observer.onStart(msg._1)
+            transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients())
+            observer.onFinish(msg._1)
+            if (sendInterval > 0) Thread.sleep(sendInterval)
+          } catch {
+            case ex: MessagingException => observer.onFail(ex)
+          }
+        }
+      } finally {
         try {
-          if (mimeMessage.getSentDate() == null) mimeMessage.setSentDate(new ju.Date())
-          var messageId = mimeMessage.getMessageID()
-          mimeMessage.saveChanges()
-          // Preserve explicitly specified message id...
-          if (messageId != null) mimeMessage.setHeader(HEADER_MESSAGE_ID, messageId)
-          transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients())
+          transport.close()
         } catch {
-          case ex: MessagingException => failedMessages.put(mimeMessage, ex)
+          case _: Throwable =>
         }
       }
-    } finally {
-      try {
-        transport.close()
-      } catch {
-        case ex: MessagingException =>
-          throw if (failedMessages.nonEmpty) new NotificationSendException("Failed to close server connection after message failures", ex,
-            failedMessages.toMap)
-          else throw new NotificationException("Failed to close server connection after message sending", ex)
-      }
-    }
-
-    if (failedMessages.nonEmpty) {
-      throw new NotificationSendException(failedMessages.toMap)
     }
   }
 
@@ -186,7 +189,7 @@ class JavaMailSender extends MailSender with Logging {
     } catch {
       case e: MessagingException => Throwables.propagate(e)
     }
-    return recipients
+    recipients
   }
 
 }

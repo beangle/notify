@@ -18,6 +18,32 @@
  */
 package org.beangle.notify
 
-@SerialVersionUID(1L)
-class NotificationException(message: String, cause: Throwable) extends RuntimeException(message, cause) {
+import org.beangle.commons.logging.Logging
+
+object SendingObserver {
+
+  object Log extends SendingObserver with Logging {
+
+    def onStart(msg: Message): Unit = {
+      logger.info(s"开始发送${msg.subject}到${msg.recipients.head}...")
+    }
+
+    def onFinish(msg: Message): Unit = {
+      logger.info(s"结束发送${msg.subject}到${msg.recipients.head}")
+    }
+
+    def onFail(e: Exception): Unit = {
+      logger.error("发送发生错误", e)
+    }
+  }
+
+}
+
+trait SendingObserver {
+
+  def onStart(msg: Message): Unit
+
+  def onFinish(msg: Message): Unit
+
+  def onFail(e: Exception): Unit
 }
