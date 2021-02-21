@@ -21,21 +21,18 @@ package org.beangle.notify.mail
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class MimeUtilsTest extends AnyFunSpec with Matchers {
+class MimeUtilsTest extends AnyFunSpec with Matchers:
 
   describe("MimeUtils") {
     it("testParseAddress") {
-      var me = "段体华<duantihua@gmail.com>,程序员<programer@gmail.com>"
-      var adds = MimeUtils.parseAddress(me, "UTF-8")
+      val me = "段体华<duantihua@gmail.com>,程序员<programer@gmail.com>"
+      val adds = MimeUtils.parseAddress(me, "UTF-8")
       var i = 0
-      for (add <- adds) {
-        if (i == 0) {
-          add.getPersonal() should equal("段体华")
-        } else {
-          add.getPersonal() should equal("程序员")
-        }
+      for (add <- adds)
+        if (i == 0)
+          add.getPersonal should equal("段体华")
+        else
+          add.getPersonal should equal("程序员")
         i += 1
-      }
     }
   }
-}

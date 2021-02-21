@@ -23,13 +23,14 @@ import com.icegreen.greenmail.util.ServerSetupTest
 import org.beangle.notify.mail.JavaMailSender
 import org.beangle.notify.mail.DefaultMailNotifier
 import org.beangle.notify.mail.MailMessage
+
 import javax.mail.MessagingException
 import org.beangle.commons.lang.Throwables
-
+import org.beangle.notify.SendingObserver
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class DefaultNotifictionTaskTest extends AnyFunSpec with Matchers {
+class DefaultNotifictionTaskTest extends AnyFunSpec with Matchers:
   private val greenMail = new GreenMail(ServerSetupTest.ALL)
   greenMail.start()
   greenMail.setUser("test1@localhost", "user1", "password")
@@ -37,25 +38,22 @@ class DefaultNotifictionTaskTest extends AnyFunSpec with Matchers {
 
   describe("JavaMailSender") {
     it("testMail") {
-      try {
+      try
         val mailSender = new JavaMailSender()
         mailSender.host = "localhost"
-        mailSender.username= "user1"
+        mailSender.username = "user1"
         mailSender.password = "password"
         mailSender.port = 3025
 
-        val notifier = new DefaultMailNotifier(mailSender,"测试name<user1@localhost>")
+        val notifier = new DefaultMailNotifier(mailSender, "测试name<user1@localhost>")
         val task = new DefaultNotificationTask(notifier)
         val mmc = new MailMessage("测试", "测试简单邮件发送机制", "user2@localhost")
         task.queue.addMessage(mmc)
-        task.send()
+        task.send(SendingObserver.Log)
         val msgs = greenMail.getReceivedMessages()
         msgs.length should be(1)
         greenMail.stop()
-      } catch {
+      catch
         case e: MessagingException => Throwables.propagate(e)
-      }
     }
   }
-
-}

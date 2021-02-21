@@ -3,15 +3,11 @@ import BuildSettings._
 import scalariform.formatter.preferences._
 
 ThisBuild / organization := "org.beangle.notify"
-ThisBuild / organizationName  := "Beangle"
-ThisBuild / startYear := Some(2015)
-ThisBuild / licenses += ("LGPL-3.0", new URL("http://www.gnu.org/licenses/lgpl-3.0.txt"))
-ThisBuild / scalaVersion := "2.13.3"
-// set the Scala version used for the project
+ThisBuild / organizationName  := "The Beangle Software"
+ThisBuild / startYear := Some(2005)
+ThisBuild / licenses += ("LGPL-3.0-or-later", new URL("http://www.gnu.org/licenses/lgpl-3.0.txt"))
+ThisBuild / scalaVersion := "3.0.0-M3"
 ThisBuild / version := "0.0.1-SNAPSHOT"
-
-// set the prompt (for this build) to include the project id.
-ThisBuild / shellPrompt := { state => Project.extract(state).currentRef.project + "> " }
 
 lazy val root = (project in file("."))
   .settings()
@@ -23,7 +19,6 @@ lazy val core = (project in file("core"))
     commonSettings,
     libraryDependencies ++= (commonDeps),
     libraryDependencies ++= Seq(jakartamail,sunmail,greenmail)
-  ).enablePlugins(AutomateHeaderPlugin)
+  ).enablePlugins(StylePlugin)
 
 publish / skip := true
-

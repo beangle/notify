@@ -1,16 +1,18 @@
+import sbt.Keys._
 import sbt._
-import Keys._
 
 object BuildSettings {
   val buildOrganization = "org.beangle.notify"
   val buildVersion = "0.0.1-SNAPSHOT"
-  val buildScalaVersion = "2.13.3"
+  val buildScalaVersion = "3.0.0-M3"
 
   val commonSettings = Seq(
     organization := buildOrganization,
     version := buildVersion,
     scalaVersion := buildScalaVersion,
-    scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-target:jvm-1.8"),
+    scalacOptions := Seq("-encoding", "UTF-8", "-feature", "-unchecked", "-deprecation"
+      , "-language:implicitConversions", "-Xtarget:11", "-Xfatal-warnings"),
+    // "-rewrite","-indent","-source:3.0-migration",
     crossPaths := false)
 }
 
@@ -19,11 +21,11 @@ object Dependencies {
   val slf4jVer = "2.0.0-alpha1"
   val mockitoVer = "3.1.0"
   val logbackVer = "1.3.0-alpha5"
-  val scalatestVer = "3.2.2"
+  val scalatestVer = "3.2.4-M1"
   val commonsVer = "5.2.0"
 
   val slf4j = "org.slf4j" % "slf4j-api" % slf4jVer
-  val scalatest = "org.scalatest" % "scalatest_2.13" % scalatestVer % "test"
+  val scalatest = "org.scalatest" % "scalatest_3.0.0-M3" % scalatestVer % "test"
   val mockito = "org.mockito" % "mockito-core" % mockitoVer % "test"
 
   val commonsCore = "org.beangle.commons" % "beangle-commons-core_2.13" % commonsVer
