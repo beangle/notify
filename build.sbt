@@ -5,7 +5,7 @@ import scalariform.formatter.preferences._
 ThisBuild / organization := "org.beangle.notify"
 ThisBuild / organizationName  := "The Beangle Software"
 ThisBuild / startYear := Some(2005)
-ThisBuild / licenses += ("LGPL-3.0-or-later", new URL("http://www.gnu.org/licenses/lgpl-3.0.txt"))
+ThisBuild / licenses += ("GNU General Public License version 3", new URL("http://www.gnu.org/licenses/lgpl-3.0.txt"))
 ThisBuild / scalaVersion := "3.0.0-M3"
 ThisBuild / version := "0.0.1-SNAPSHOT"
 
