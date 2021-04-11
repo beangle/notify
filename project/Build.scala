@@ -4,7 +4,7 @@ import sbt._
 object BuildSettings {
   val buildOrganization = "org.beangle.notify"
   val buildVersion = "0.0.1-SNAPSHOT"
-  val buildScalaVersion = "3.0.0-RC1"
+  val buildScalaVersion = "3.0.0-RC2"
 
   val commonSettings = Seq(
     organization := buildOrganization,
