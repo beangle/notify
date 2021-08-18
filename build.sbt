@@ -1,13 +1,29 @@
 import Dependencies._
 import BuildSettings._
-import scalariform.formatter.preferences._
+import sbt.url
 
 ThisBuild / organization := "org.beangle.notify"
-ThisBuild / organizationName  := "The Beangle Software"
-ThisBuild / startYear := Some(2005)
-ThisBuild / licenses += ("GNU General Public License version 3", new URL("http://www.gnu.org/licenses/lgpl-3.0.txt"))
-ThisBuild / scalaVersion := "3.0.0-RC2"
-ThisBuild / version := "0.0.1-SNAPSHOT"
+ThisBuild / version := "0.0.2-SNAPSHOT"
+
+ThisBuild / scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/beangle/notify"),
+    "scm:git@github.com:beangle/notify.git"
+  )
+)
+
+ThisBuild / developers := List(
+  Developer(
+    id    = "chaostone",
+    name  = "Tihua Duan",
+    email = "duantihua@gmail.com",
+    url   = url("http://github.com/duantihua")
+  )
+)
+
+ThisBuild / description := "The Beangle Notify Library"
+ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
+ThisBuild / resolvers += Resolver.mavenLocal
 
 lazy val root = (project in file("."))
   .settings()
@@ -19,6 +35,6 @@ lazy val core = (project in file("core"))
     commonSettings,
     libraryDependencies ++= (commonDeps),
     libraryDependencies ++= Seq(jakartamail,sunmail,greenmail)
-  ).enablePlugins(StylePlugin)
+  )
 
 publish / skip := true
