@@ -1,6 +1,5 @@
-import Dependencies._
-import BuildSettings._
-import sbt.url
+import org.beangle.parent.Dependencies._
+import org.beangle.parent.Settings._
 
 ThisBuild / organization := "org.beangle.notify"
 ThisBuild / version := "0.0.2-SNAPSHOT"
@@ -23,7 +22,15 @@ ThisBuild / developers := List(
 
 ThisBuild / description := "The Beangle Notify Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
-ThisBuild / resolvers += Resolver.mavenLocal
+
+
+val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.2.5"
+
+val jakarta_mail_api = "jakarta.mail" % "jakarta.mail-api" % "1.6.5"
+val jakarta_mail = "com.sun.mail" % "jakarta.mail" % "1.6.5"
+val greenmail = "com.icegreen" % "greenmail" % "1.6.1" % "test"
+
+val commonDeps = Seq(logback_classic, logback_core, beangle_commons_core, scalatest)
 
 lazy val root = (project in file("."))
   .settings()
@@ -32,9 +39,9 @@ lazy val root = (project in file("."))
 lazy val core = (project in file("core"))
   .settings(
     name := "beangle-notify-core",
-    commonSettings,
+    common,
     libraryDependencies ++= (commonDeps),
-    libraryDependencies ++= Seq(jakartamail,sunmail,greenmail)
+    libraryDependencies ++= Seq(jakarta_mail_api,jakarta_mail,greenmail)
   )
 
 publish / skip := true
