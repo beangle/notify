@@ -23,7 +23,7 @@ import org.beangle.commons.lang.Strings
 import org.beangle.commons.collection.Collections
 import org.beangle.notify.AbstractMessage
 import org.beangle.notify.Message
-import javax.mail.internet.InternetAddress
+import jakarta.mail.internet.InternetAddress
 import scala.collection.mutable
 
 class MailMessage extends AbstractMessage:

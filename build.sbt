@@ -24,11 +24,7 @@ ThisBuild / description := "The Beangle Notify Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
 
 
-val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.2.5"
-
-val jakarta_mail_api = "jakarta.mail" % "jakarta.mail-api" % "1.6.5"
-val jakarta_mail = "com.sun.mail" % "jakarta.mail" % "1.6.5"
-val greenmail = "com.icegreen" % "greenmail" % "1.6.1" % "test"
+val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.2.6"
 
 val commonDeps = Seq(logback_classic, logback_core, beangle_commons_core, scalatest)
 

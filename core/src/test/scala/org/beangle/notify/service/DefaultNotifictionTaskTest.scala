@@ -23,7 +23,7 @@ import org.beangle.notify.mail.JavaMailSender
 import org.beangle.notify.mail.DefaultMailNotifier
 import org.beangle.notify.mail.MailMessage
 
-import javax.mail.MessagingException
+import jakarta.mail.MessagingException
 import org.beangle.commons.lang.Throwables
 import org.beangle.notify.SendingObserver
 import org.scalatest.funspec.AnyFunSpec
