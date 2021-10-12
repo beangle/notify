@@ -22,8 +22,8 @@ import java.util.Properties
 import java.{ util => ju }
 
 import com.sun.mail.util.MailSSLSocketFactory
-import javax.mail.internet.{ MimeMessage, MimeUtility }
-import javax.mail.{ MessagingException, NoSuchProviderException, Session, Transport }
+import jakarta.mail.internet.{ MimeMessage, MimeUtility }
+import jakarta.mail.{ MessagingException, NoSuchProviderException, Session, Transport }
 import org.beangle.commons.lang.{ Strings, Throwables }
 import org.beangle.commons.logging.Logging
 import org.beangle.notify.{ NotifyException, SendingObserver }
@@ -155,13 +155,13 @@ class JavaMailSender extends MailSender with Logging:
     var recipients = 0
     try
       for (to <- mailMsg.to)
-        mimeMsg.addRecipient(javax.mail.Message.RecipientType.TO, to)
+        mimeMsg.addRecipient(jakarta.mail.Message.RecipientType.TO, to)
         recipients += 1
       for (cc <- mailMsg.cc)
-        mimeMsg.addRecipient(javax.mail.Message.RecipientType.CC, cc)
+        mimeMsg.addRecipient(jakarta.mail.Message.RecipientType.CC, cc)
         recipients += 1
       for (bcc <- mailMsg.bcc)
-        mimeMsg.addRecipient(javax.mail.Message.RecipientType.BCC, bcc)
+        mimeMsg.addRecipient(jakarta.mail.Message.RecipientType.BCC, bcc)
         recipients += 1
     catch
       case e: MessagingException => Throwables.propagate(e)

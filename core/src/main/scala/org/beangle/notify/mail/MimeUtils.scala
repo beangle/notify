@@ -18,7 +18,7 @@
 package org.beangle.notify.mail
 
 import scala.collection.mutable
-import javax.mail.internet.InternetAddress
+import jakarta.mail.internet.InternetAddress
 import org.beangle.commons.lang.Strings
 
 object MimeUtils:
