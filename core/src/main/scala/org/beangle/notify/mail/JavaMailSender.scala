@@ -19,14 +19,13 @@ package org.beangle.notify.mail
 
 import java.io.UnsupportedEncodingException
 import java.util.Properties
-import java.{ util => ju }
-
-import com.sun.mail.util.MailSSLSocketFactory
-import jakarta.mail.internet.{ MimeMessage, MimeUtility }
-import jakarta.mail.{ MessagingException, NoSuchProviderException, Session, Transport }
-import org.beangle.commons.lang.{ Strings, Throwables }
+import java.util as ju
+import jakarta.mail.internet.{MimeMessage, MimeUtility}
+import jakarta.mail.{MessagingException, NoSuchProviderException, Session, Transport}
+import org.beangle.commons.lang.{Strings, Throwables}
 import org.beangle.commons.logging.Logging
-import org.beangle.notify.{ NotifyException, SendingObserver }
+import org.beangle.notify.{NotifyException, SendingObserver}
+import org.eclipse.angus.mail.util.MailSSLSocketFactory
 
 import scala.collection.mutable.ArrayBuffer
 

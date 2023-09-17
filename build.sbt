@@ -2,7 +2,7 @@ import org.beangle.parent.Dependencies._
 import org.beangle.parent.Settings._
 
 ThisBuild / organization := "org.beangle.notify"
-ThisBuild / version := "0.1.2-SNAPSHOT"
+ThisBuild / version := "0.1.2"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -24,7 +24,7 @@ ThisBuild / description := "The Beangle Notify Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
 
 
-val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.5.0"
+val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.6.0"
 
 val commonDeps = Seq(logback_classic, logback_core, beangle_commons_core, scalatest)
 
