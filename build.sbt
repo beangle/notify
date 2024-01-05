@@ -2,7 +2,7 @@ import org.beangle.parent.Dependencies._
 import org.beangle.parent.Settings._
 
 ThisBuild / organization := "org.beangle.notify"
-ThisBuild / version := "0.1.3-SNAPSHOT"
+ThisBuild / version := "0.1.3"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -24,7 +24,7 @@ ThisBuild / description := "The Beangle Notify Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
 
 
-val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.6.0"
+val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.6.8"
 
 val commonDeps = Seq(logback_classic, logback_core, beangle_commons_core, scalatest)
 
@@ -37,7 +37,7 @@ lazy val core = (project in file("core"))
     name := "beangle-notify-core",
     common,
     libraryDependencies ++= (commonDeps),
-    libraryDependencies ++= Seq(jakarta_mail_api,jakarta_mail,greenmail)
+    libraryDependencies ++= Seq(jakarta_mail_api,jakarta_mail_angus,greenmail)
   )
 
 publish / skip := true
