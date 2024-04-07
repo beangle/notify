@@ -1,8 +1,8 @@
-import org.beangle.parent.Dependencies._
-import org.beangle.parent.Settings._
+import org.beangle.parent.Dependencies.*
+import org.beangle.parent.Settings.*
 
 ThisBuild / organization := "org.beangle.notify"
-ThisBuild / version := "0.1.4"
+ThisBuild / version := "0.1.5"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -13,10 +13,10 @@ ThisBuild / scmInfo := Some(
 
 ThisBuild / developers := List(
   Developer(
-    id    = "chaostone",
-    name  = "Tihua Duan",
+    id = "chaostone",
+    name = "Tihua Duan",
     email = "duantihua@gmail.com",
-    url   = url("http://github.com/duantihua")
+    url = url("http://github.com/duantihua")
   )
 )
 
@@ -24,20 +24,12 @@ ThisBuild / description := "The Beangle Notify Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
 
 
-val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.6.10"
-
-val commonDeps = Seq(logback_classic, logback_core, beangle_commons_core, scalatest)
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "5.6.15"
 
 lazy val root = (project in file("."))
-  .settings()
-  .aggregate(core)
-
-lazy val core = (project in file("core"))
   .settings(
-    name := "beangle-notify-core",
+    name := "beangle-notify",
     common,
-    libraryDependencies ++= (commonDeps),
-    libraryDependencies ++= Seq(jakarta_mail_api,jakarta_mail_angus,greenmail)
+    libraryDependencies ++= Seq(logback_classic % "test", greenmail, scalatest),
+    libraryDependencies ++= Seq(beangle_commons, jakarta_mail_api, jakarta_mail_angus)
   )
-
-publish / skip := true
