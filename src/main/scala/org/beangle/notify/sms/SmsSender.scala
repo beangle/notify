@@ -17,12 +17,7 @@
 
 package org.beangle.notify.sms
 
-case class SmsResponse(code: String, message: String) {
-  def isOk: Boolean = code == "OK"
-}
+trait SmsSender {
 
-case class Receiver(mobile: String, name: String) {
-  def maskMobile: String = {
-    if mobile.length == 11 then mobile.substring(0, 3) + "****" + mobile.substring(7, 11) else mobile
-  }
+  def send(receiver: Receiver, contents: String): SmsResponse
 }
