@@ -17,7 +17,7 @@
 
 package org.beangle.notify.sms
 
-import org.beangle.cache.Cache
+import org.beangle.commons.cache.Cache
 import org.beangle.cache.caffeine.CaffeineCacheManager
 import org.beangle.commons.lang.Strings
 
