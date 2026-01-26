@@ -19,7 +19,8 @@ package org.beangle.notify.sms.vendor
 
 import org.beangle.commons.lang.{Charsets, Strings}
 import org.beangle.commons.logging.Logging
-import org.beangle.commons.net.http.{HttpMethods, HttpUtils}
+import org.beangle.commons.net.Networks
+import org.beangle.commons.net.http.{HttpMethods, HttpUtils, Request}
 import org.beangle.notify.sms.{Receiver, SmsResponse, SmsSender}
 
 import java.io.OutputStreamWriter
@@ -57,14 +58,9 @@ class EcuplSmsSender extends SmsSender, Logging {
       case Some(token) =>
         val postUrl = s"${base}/message/sendMessageBySMSApi"
         val receiverContacts = List(receiver).map(x => s"{\"name\": \"${URLEncoder.encode(x.name, Charsets.UTF_8)}\",\"mobile\":\"${x.mobile}\"}").mkString(",")
-        val res = HttpUtils.getText(URI.create(postUrl).toURL, HttpMethods.POST, Charsets.UTF_8, Some({ conn =>
-          conn.setDoOutput(true)
-          conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-          val writer = new OutputStreamWriter(conn.getOutputStream)
-          val formData = s"""token=${token}&msgContent=${URLEncoder.encode(contents, Charsets.UTF_8)}&receivers=[${receiverContacts}]"""
-          writer.write(formData)
-          writer.close()
-        }))
+        val formData = s"""token=${token}&msgContent=${URLEncoder.encode(contents, Charsets.UTF_8)}&receivers=[${receiverContacts}]"""
+        val request = new Request(formData,"application/x-www-form-urlencoded")
+        val res = HttpUtils.post(Networks.url(postUrl),request)
         if (res.isOk) {
           val restext = res.getText
           SmsResponse("OK", Strings.substringBetween(restext, "\"msgId\":\"", "\""))
