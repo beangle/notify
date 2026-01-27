@@ -37,8 +37,8 @@ class B2mSmsSender extends SmsSender {
     val sign = Digests.md5Hex(appId + appSecret + sendTime)
     val encodedContent = URLEncoder.encode(contents, Charsets.UTF_8)
     val sendUrl = s"${url}?appId=${appId}&timestamp=${sendTime}&sign=${sign}&mobiles=${receiver.mobile}&content=${encodedContent}"
-    val res = HttpUtils.getText(sendUrl)
-    if (res.status == 200 && res.getText.contains("SUCCESS")) {
+    val res = HttpUtils.get(sendUrl)
+    if (res.isOk && res.getText.contains("SUCCESS")) {
       SmsResponse("OK", "发送成功")
     } else {
       SmsResponse("Failure", res.getText)

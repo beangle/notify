@@ -19,14 +19,11 @@ package org.beangle.notify.sms.vendor
 
 import org.beangle.commons.lang.{Charsets, Strings}
 import org.beangle.commons.logging.Logging
-import org.beangle.commons.net.Networks
-import org.beangle.commons.net.http.{HttpMethods, HttpUtils, Request}
+import org.beangle.commons.net.http.{HttpUtils, Request}
 import org.beangle.notify.sms.{Receiver, SmsResponse, SmsSender}
 
-import java.io.OutputStreamWriter
-import java.net.{URI, URLEncoder}
-import java.nio.charset.Charset
-import java.time.temporal.{ChronoUnit, TemporalUnit}
+import java.net.URLEncoder
+import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant}
 
 class EcuplSmsSender extends SmsSender, Logging {
@@ -40,7 +37,7 @@ class EcuplSmsSender extends SmsSender, Logging {
   def fetchToken(): Option[String] = {
     val now = Instant.now
     if (null == tokenInfo || Math.abs(Duration.between(tokenInfo._2, now).get(ChronoUnit.SECONDS)) >= tokenLiveTime) {
-      val tokenRes = HttpUtils.getText(s"${base}/msg/getThirdAPIToken?appId=${appId}&appPassword=${appSecret}")
+      val tokenRes = HttpUtils.get(s"${base}/msg/getThirdAPIToken?appId=${appId}&appPassword=${appSecret}")
       if (tokenRes.isOk && tokenRes.getText.contains("000000")) {
         val token = Strings.substringBetween(tokenRes.getText, "\"token\":\"", "\"")
         if (Strings.isNotEmpty(token)) {
@@ -59,13 +56,12 @@ class EcuplSmsSender extends SmsSender, Logging {
         val postUrl = s"${base}/message/sendMessageBySMSApi"
         val receiverContacts = List(receiver).map(x => s"{\"name\": \"${URLEncoder.encode(x.name, Charsets.UTF_8)}\",\"mobile\":\"${x.mobile}\"}").mkString(",")
         val formData = s"""token=${token}&msgContent=${URLEncoder.encode(contents, Charsets.UTF_8)}&receivers=[${receiverContacts}]"""
-        val request = new Request(formData,"application/x-www-form-urlencoded")
-        val res = HttpUtils.post(Networks.url(postUrl),request)
+        val res = HttpUtils.post(postUrl, Request.asForm(formData))
         if (res.isOk) {
           val restext = res.getText
           SmsResponse("OK", Strings.substringBetween(restext, "\"msgId\":\"", "\""))
         } else {
-          logger.error("sms error:" + res.getText + "(receivers:" + receiver.toString() + " msg:" + contents + ")")
+          logger.error("sms error:" + res.getText + "(receivers:" + receiver.toString + " msg:" + contents + ")")
           SmsResponse("Failure", res.getText)
         }
       case None =>
