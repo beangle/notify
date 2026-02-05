@@ -2,7 +2,7 @@ import org.beangle.parent.Dependencies.*
 import org.beangle.parent.Settings.*
 
 ThisBuild / organization := "org.beangle.notify"
-ThisBuild / version := "0.1.19-SNAPSHOT"
+ThisBuild / version := "0.1.19"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -23,8 +23,8 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Notify Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
 
-val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.0.0-SNAPSHOT"
-val beangle_cache = "org.beangle.cache" % "beangle-cache" % "0.1.19-SNAPSHOT"
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.0.0"
+val beangle_cache = "org.beangle.cache" % "beangle-cache" % "0.1.19"
 
 lazy val root = (project in file("."))
   .settings(
