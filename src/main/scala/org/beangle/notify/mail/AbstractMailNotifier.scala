@@ -17,10 +17,9 @@
 
 package org.beangle.notify.mail
 
-import org.beangle.commons.logging.Logging
-import org.beangle.notify.{ Message, Notifier, SendingObserver }
+import org.beangle.notify.{Message, Notifier, NotifyLogger, SendingObserver}
 
-abstract class AbstractMailNotifier(val mailSender: MailSender, val from: String) extends Notifier with Logging:
+abstract class AbstractMailNotifier(val mailSender: MailSender, val from: String) extends Notifier:
 
   override def getType: String = "mail"
 
@@ -28,13 +27,12 @@ abstract class AbstractMailNotifier(val mailSender: MailSender, val from: String
     deliver(List(message), observer)
 
   override def deliver(messages: Iterable[Message], observer: SendingObserver): Unit =
-    messages foreach { message =>
-      message match
-        case msg: MailMessage =>
-          if (null == msg.from && null != from)
-            msg.from(from)
-          mailSender.send(msg, observer)
-        case _ => logger.warn("Mail Notifier should deliver mail message only")
+    messages foreach {
+      case msg: MailMessage =>
+        if (null == msg.from && null != from)
+          msg.from(from)
+        mailSender.send(msg, observer)
+      case _ => NotifyLogger.warn("Mail Notifier should deliver mail message only")
     }
 
   protected def buildSubject(msg: Message): String

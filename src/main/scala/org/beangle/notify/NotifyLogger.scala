@@ -17,25 +17,6 @@
 
 package org.beangle.notify
 
-object SendingObserver {
+import org.beangle.commons.logging.{Logger, slf4j}
 
-  object Log extends SendingObserver {
-
-    def onStart(msg: Message): Unit =
-      NotifyLogger.info(s"开始发送${msg.subject}到${msg.recipients.head}...")
-
-    def onFinish(msg: Message): Unit =
-      NotifyLogger.info(s"结束发送${msg.subject}到${msg.recipients.head}")
-
-    def onFail(e: Exception): Unit =
-      NotifyLogger.error("发送发生错误", e)
-  }
-}
-
-trait SendingObserver {
-  def onStart(msg: Message): Unit
-
-  def onFinish(msg: Message): Unit
-
-  def onFail(e: Exception): Unit
-}
+object NotifyLogger extends Logger(slf4j("org.beangle.notify"))

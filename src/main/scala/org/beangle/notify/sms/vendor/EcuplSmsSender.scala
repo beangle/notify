@@ -18,15 +18,15 @@
 package org.beangle.notify.sms.vendor
 
 import org.beangle.commons.lang.{Charsets, Strings}
-import org.beangle.commons.logging.Logging
 import org.beangle.commons.net.http.{HttpUtils, Request}
+import org.beangle.notify.NotifyLogger
 import org.beangle.notify.sms.{Receiver, SmsResponse, SmsSender}
 
 import java.net.URLEncoder
 import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant}
 
-class EcuplSmsSender extends SmsSender, Logging {
+class EcuplSmsSender extends SmsSender {
 
   var base: String = _
   var appId: String = _
@@ -61,11 +61,11 @@ class EcuplSmsSender extends SmsSender, Logging {
           val restext = res.getText
           SmsResponse("OK", Strings.substringBetween(restext, "\"msgId\":\"", "\""))
         } else {
-          logger.error("sms error:" + res.getText + "(receivers:" + receiver.toString + " msg:" + contents + ")")
+          NotifyLogger.error("sms error:" + res.getText + "(receivers:" + receiver.toString + " msg:" + contents + ")")
           SmsResponse("Failure", res.getText)
         }
       case None =>
-        logger.error("Cannot get invoke token")
+        NotifyLogger.error("Cannot get invoke token")
         SmsResponse("Failure", "Cannot get invoke token")
   }
 

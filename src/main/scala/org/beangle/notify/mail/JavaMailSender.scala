@@ -17,16 +17,17 @@
 
 package org.beangle.notify.mail
 
-import java.io.UnsupportedEncodingException
-import java.util.Properties
-import java.util as ju
 import jakarta.mail.internet.{MimeMessage, MimeUtility}
 import jakarta.mail.{MessagingException, NoSuchProviderException, Session, Transport}
+import org.beangle.commons.concurrent.Locks
 import org.beangle.commons.lang.{Strings, Throwables}
-import org.beangle.commons.logging.Logging
 import org.beangle.notify.{NotifyException, SendingObserver}
 import org.eclipse.angus.mail.util.MailSSLSocketFactory
 
+import java.io.UnsupportedEncodingException
+import java.util as ju
+import java.util.Properties
+import java.util.concurrent.locks.ReentrantLock
 import scala.collection.mutable.ArrayBuffer
 
 object JavaMailSender:
@@ -54,9 +55,9 @@ object JavaMailSender:
     sender.properties.put("mail.smtp.socketFactory", sf)
     sender
 
-import org.beangle.notify.mail.JavaMailSender._
+import org.beangle.notify.mail.JavaMailSender.*
 
-class JavaMailSender extends MailSender with Logging:
+class JavaMailSender extends MailSender {
 
   var properties: Properties = new Properties()
 
@@ -75,11 +76,13 @@ class JavaMailSender extends MailSender with Logging:
   var sendInterval: Long = 0
 
   private var session: Session = _
+  private val lock = new ReentrantLock()
 
-  override def send(msg: MailMessage, observer: SendingObserver): Unit =
+  override def send(msg: MailMessage, observer: SendingObserver): Unit = {
     send(List(msg), observer)
+  }
 
-  override def send(messages: Iterable[MailMessage], observer: SendingObserver): Unit =
+  override def send(messages: Iterable[MailMessage], observer: SendingObserver): Unit = {
     val mimeMsgs = new ArrayBuffer[(MailMessage, MimeMessage)]
     for (m <- messages)
       try
@@ -87,8 +90,9 @@ class JavaMailSender extends MailSender with Logging:
       catch
         case e: MessagingException => observer.onFail(new NotifyException("Cannot mapping message" + m.subject, e))
     doSend(mimeMsgs, observer)
+  }
 
-  protected def createMimeMessage(mailMsg: MailMessage): MimeMessage =
+  protected def createMimeMessage(mailMsg: MailMessage): MimeMessage = {
     val mimeMsg = new MimeMessage(getSession())
 
     mimeMsg.setSentDate(if (null == mailMsg.sentAt) new ju.Date() else ju.Date.from(mailMsg.sentAt))
@@ -106,51 +110,56 @@ class JavaMailSender extends MailSender with Logging:
     else
       mimeMsg.setText(text, if (Strings.isEmpty(encoding)) null else encoding)
     mimeMsg
+  }
 
-  protected def getSession(): Session =
-    this.synchronized {
+  protected def getSession(): Session = {
+    Locks.withLock(lock) {
       if (this.session == null) this.session = Session.getInstance(this.properties)
       this.session
     }
+  }
 
-  protected def getTransport(session: Session): Transport =
+  protected def getTransport(session: Session): Transport = {
     var pro = this.protocol
     if (pro == null) pro = session.getProperty("mail.transport.protocol")
     try
       session.getTransport(pro)
     catch
       case e: NoSuchProviderException => throw e
+  }
 
-  protected def doSend(msgs: Iterable[(MailMessage, MimeMessage)], observer: SendingObserver): Unit =
+  protected def doSend(msgs: Iterable[(MailMessage, MimeMessage)], observer: SendingObserver): Unit = {
     var transport: Transport = null
     try
       transport = getTransport(getSession())
       transport.connect(host, port, username, password)
     catch
       case ex: Exception => observer.onFail(ex)
-    if (null != transport)
-      try
-        for (msg <- msgs)
-          val mimeMessage = msg._2
-          try
-            if (mimeMessage.getSentDate() == null) mimeMessage.setSentDate(new ju.Date())
-            val messageId = mimeMessage.getMessageID()
-            mimeMessage.saveChanges()
-            // Preserve explicitly specified message id...
-            if (messageId != null) mimeMessage.setHeader(HEADER_MESSAGE_ID, messageId)
-            observer.onStart(msg._1)
-            transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients())
-            observer.onFinish(msg._1)
-            if (sendInterval > 0) Thread.sleep(sendInterval)
-          catch
-            case ex: MessagingException => observer.onFail(ex)
-      finally
-        try
-          transport.close()
-        catch
-          case _: Throwable =>
 
-  private def addRecipient(mimeMsg: MimeMessage, mailMsg: MailMessage): Int =
+    if (null != transport) {
+      for (msg <- msgs)
+        val mimeMessage = msg._2
+        try
+          if (mimeMessage.getSentDate() == null) mimeMessage.setSentDate(new ju.Date())
+          val messageId = mimeMessage.getMessageID()
+          mimeMessage.saveChanges()
+          // Preserve explicitly specified message id...
+          if (messageId != null) mimeMessage.setHeader(HEADER_MESSAGE_ID, messageId)
+          observer.onStart(msg._1)
+          transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients())
+          observer.onFinish(msg._1)
+          if (sendInterval > 0) Thread.sleep(sendInterval)
+        catch
+          case ex: MessagingException => observer.onFail(ex)
+        finally
+          try
+            transport.close()
+          catch
+            case _: Throwable =>
+    }
+  }
+
+  private def addRecipient(mimeMsg: MimeMessage, mailMsg: MailMessage): Int = {
     var recipients = 0
     try
       for (to <- mailMsg.to)
@@ -165,3 +174,5 @@ class JavaMailSender extends MailSender with Logging:
     catch
       case e: MessagingException => Throwables.propagate(e)
     recipients
+  }
+}
