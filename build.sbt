@@ -23,13 +23,14 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Notify Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
 
-val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.0.0"
-val beangle_cache = "org.beangle.cache" % "beangle-cache" % "0.1.20-SNAPSHOT"
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.0.4"
+val beangle_cache = "org.beangle.cache" % "beangle-cache" % "0.1.19"
 
 lazy val root = (project in file("."))
   .settings(
     name := "beangle-notify",
     common,
     libraryDependencies ++= Seq(slf4j, logback_classic % "test", greenmail, scalatest),
-    libraryDependencies ++= Seq(beangle_commons, beangle_cache, jakarta_mail_api, jakarta_mail_angus)
+    libraryDependencies ++= Seq(beangle_commons, beangle_cache, jakarta_mail_api, jakarta_mail_angus),
+    libraryDependencies ++= Seq(jedis % "optional")
   )

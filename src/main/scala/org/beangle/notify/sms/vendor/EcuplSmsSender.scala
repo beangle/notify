@@ -26,6 +26,8 @@ import java.net.URLEncoder
 import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant}
 
+/** Ecupl 验证码发送实现
+ */
 class EcuplSmsSender extends SmsSender {
 
   var base: String = _

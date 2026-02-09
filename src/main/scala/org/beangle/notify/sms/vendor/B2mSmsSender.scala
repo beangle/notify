@@ -26,6 +26,8 @@ import java.net.URLEncoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/** B2m发送实现
+ */
 class B2mSmsSender extends SmsSender {
 
   var appId: String = _

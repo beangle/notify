@@ -17,9 +17,12 @@
 
 package org.beangle.notify.sms
 
-import org.beangle.commons.cache.Cache
 import org.beangle.cache.caffeine.CaffeineCacheManager
+import org.beangle.cache.redis.RedisCacheManager
+import org.beangle.commons.cache.Cache
+import org.beangle.commons.io.DefaultBinarySerializer
 import org.beangle.commons.lang.Strings
+import redis.clients.jedis.RedisClient
 
 import java.util.regex.Pattern
 
@@ -27,25 +30,37 @@ import java.util.regex.Pattern
  */
 class DefaultSmsCodeService extends SmsCodeService {
   var smsSender: SmsSender = _
-  var template: String = "您的验证码为{code}，{ttl}分钟有效!"
+  //验证码模板
+  var defaultTemplate: String = "您的验证码为{code}，{ttl}分钟有效!"
+  //默认五分钟有效
   var ttl: Int = 5 * 60
+  //可选的redis缓存，否则采用进程内缓存
+  var redisClient: Option[RedisClient] = None
+  /** 缓存名称 */
+  var cacheName: String = "sms_code"
+
   private val cache = buildCache()
   private val mobilePattern = Pattern.compile("^1(3[0-9]|4[01456879]|5[0-3,5-9]|6[2567]|7[0-8]|8[0-9]|9[0-3,5-9])\\d{8}$")
 
-  override def send(receiver: Receiver): String = {
+  override def send(receiver: Receiver): (Boolean, String) = {
+    send(receiver, defaultTemplate)
+  }
+
+  override def send(receiver: Receiver, template: String): (Boolean, String) = {
+    val templateStr = if Strings.isBlank(template) then defaultTemplate else template
     get(receiver.mobile) match
-      case Some(code) => "验证码已经发送"
+      case Some(code) => (true, "验证码已经发送")
       case None =>
         val code = generateCode()
-        var contents = Strings.replace(template, "{code}", code)
+        var contents = Strings.replace(templateStr, "{code}", code)
         contents = Strings.replace(contents, "{ttl}", ttlMinutes.toString)
 
         val res = smsSender.send(receiver, contents)
         if (res.isOk) {
           set(receiver.mobile, code)
-          s"验证码成功发送到${receiver.maskMobile}"
+          (true, s"验证码成功发送到${receiver.maskMobile}")
         } else {
-          "验证码发送失败:" + res.message
+          (false, "验证码发送失败:" + res.message)
         }
   }
 
@@ -78,9 +93,16 @@ class DefaultSmsCodeService extends SmsCodeService {
   }
 
   protected def buildCache(): Cache[String, String] = {
-    val cacheManager = new CaffeineCacheManager(true)
-    cacheManager.ttl = ttl
-    cacheManager.getCache("sms-code", classOf[String], classOf[String])
+    redisClient match {
+      case None =>
+        val cacheManager = new CaffeineCacheManager(true)
+        cacheManager.ttl = ttl
+        cacheManager.getCache(cacheName, classOf[String], classOf[String])
+      case Some(client) =>
+        val cacheManager = new RedisCacheManager(client, DefaultBinarySerializer, true)
+        cacheManager.ttl = ttl
+        cacheManager.getCache(cacheName, classOf[String], classOf[String])
+    }
   }
 }
 

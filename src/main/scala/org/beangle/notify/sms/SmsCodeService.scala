@@ -17,9 +17,13 @@
 
 package org.beangle.notify.sms
 
+/** 短信验证码发送服务
+ */
 trait SmsCodeService {
 
-  def send(receiver: Receiver): String
+  def send(receiver: Receiver, template: String): (Boolean, String)
+
+  def send(receiver: Receiver): (Boolean, String)
 
   def verify(mobile: String, code: String): Boolean
 
