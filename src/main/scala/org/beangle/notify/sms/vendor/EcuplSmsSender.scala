@@ -20,7 +20,7 @@ package org.beangle.notify.sms.vendor
 import org.beangle.commons.lang.{Charsets, Strings}
 import org.beangle.commons.net.http.{HttpUtils, Request}
 import org.beangle.notify.NotifyLogger
-import org.beangle.notify.sms.{Receiver, SmsResponse, SmsSender}
+import org.beangle.notify.sms.{AbstractSmsSender, Receiver, SmsResponse}
 
 import java.net.URLEncoder
 import java.time.temporal.ChronoUnit
@@ -28,18 +28,16 @@ import java.time.{Duration, Instant}
 
 /** Ecupl 验证码发送实现
  */
-class EcuplSmsSender extends SmsSender {
+class EcuplSmsSender(endpoint: String, appId: String, appSecret: String)
+  extends AbstractSmsSender(endpoint, appId, appSecret) {
 
-  var base: String = _
-  var appId: String = _
-  var appSecret: String = _
   var tokenInfo: (String, Instant) = _
   var tokenLiveTime = 600 //600s
 
-  def fetchToken(): Option[String] = {
+  private def fetchToken(): Option[String] = {
     val now = Instant.now
     if (null == tokenInfo || Math.abs(Duration.between(tokenInfo._2, now).get(ChronoUnit.SECONDS)) >= tokenLiveTime) {
-      val tokenRes = HttpUtils.get(s"${base}/msg/getThirdAPIToken?appId=${appId}&appPassword=${appSecret}")
+      val tokenRes = HttpUtils.get(s"${endpoint}/msg/getThirdAPIToken?appId=${appId}&appPassword=${appSecret}")
       if (tokenRes.isOk && tokenRes.getText.contains("000000")) {
         val token = Strings.substringBetween(tokenRes.getText, "\"token\":\"", "\"")
         if (Strings.isNotEmpty(token)) {
@@ -55,20 +53,20 @@ class EcuplSmsSender extends SmsSender {
   override def send(receiver: Receiver, contents: String): SmsResponse = {
     fetchToken() match
       case Some(token) =>
-        val postUrl = s"${base}/message/sendMessageBySMSApi"
+        val postUrl = s"${endpoint}/message/sendMessageBySMSApi"
         val receiverContacts = List(receiver).map(x => s"{\"name\": \"${URLEncoder.encode(x.name, Charsets.UTF_8)}\",\"mobile\":\"${x.mobile}\"}").mkString(",")
         val formData = s"""token=${token}&msgContent=${URLEncoder.encode(contents, Charsets.UTF_8)}&receivers=[${receiverContacts}]"""
         val res = HttpUtils.post(postUrl, Request.asForm(formData))
         if (res.isOk) {
           val restext = res.getText
-          SmsResponse("OK", Strings.substringBetween(restext, "\"msgId\":\"", "\""))
+          SmsResponse.ok(Strings.substringBetween(restext, "\"msgId\":\"", "\""))
         } else {
           NotifyLogger.error("sms error:" + res.getText + "(receivers:" + receiver.toString + " msg:" + contents + ")")
-          SmsResponse("Failure", res.getText)
+          SmsResponse.fail(res.getText)
         }
       case None =>
         NotifyLogger.error("Cannot get invoke token")
-        SmsResponse("Failure", "Cannot get invoke token")
+        SmsResponse.fail("Cannot get invoke token")
   }
 
 }

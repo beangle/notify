@@ -17,22 +17,15 @@
 
 package org.beangle.notify.sms
 
-object SmsResponse {
-  def ok(message: String): SmsResponse = {
-    SmsResponse("OK", message)
-  }
+import org.beangle.commons.bean.Initializing
 
-  def fail(message: String): SmsResponse = {
-    SmsResponse("Failure", message)
-  }
-}
+/** 使用 appId、appSecret 与 HTTP 根路径（endpoint）的短信发送器公共配置。
+ *
+ * `endpoint` 表示网关根 URL（不含末尾具体接口路径），由各实现自行拼接路径或查询串。
+ */
+abstract class AbstractSmsSender(protected val endpoint: String,
+                                 protected val appId: String,
+                                 protected val appSecret: String) extends SmsSender, Initializing {
 
-case class SmsResponse(code: String, message: String) {
-  def isOk: Boolean = code == "OK"
-}
-
-case class Receiver(mobile: String, name: String) {
-  def maskMobile: String = {
-    if mobile.length == 11 then mobile.substring(0, 3) + "****" + mobile.substring(7, 11) else mobile
-  }
+  override def init(): Unit = {}
 }
