@@ -78,4 +78,3 @@ class LixinSmsSenderTest extends AnyFunSpec with Matchers:
       resp.message should be("internal error")
     }
   }
-
