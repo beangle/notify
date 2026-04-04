@@ -53,7 +53,6 @@ class LixinSmsSender(endpoint: String, appId: String, appSecret: String)
     s"${endpoint.stripSuffix("/")}/msg.msgHttpSoap11Endpoint/"
 
   private def buildPayloadXml(receiver: Receiver, contents: String): String = {
-
     val b = new StringBuilder
     b.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
     b.append("<message>")

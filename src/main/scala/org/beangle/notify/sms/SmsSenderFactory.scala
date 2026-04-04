@@ -22,14 +22,18 @@ import org.beangle.commons.collection.Collections
 import org.beangle.notify.sms.vendor.{B2mSmsSender, EcuplSmsSender, LixinSmsSender}
 
 object SmsSenderFactory {
+  val Vendor = "vendor"
+  val EndPoint = "endpoint"
+  val AppId = "appId"
+  val AppSecret = "appSecret"
 
   def createSender(params: collection.Map[String, String]): SmsSender = {
     val ps = Collections.newMap[String, String]
     ps.addAll(params)
-    val endpointOpt = ps.remove("endpoint")
-    val appIdOpt = ps.remove("appId")
-    val appSecretOpt = ps.remove("appSecret")
-    val vendorOpt = ps.remove("vendor")
+    val endpointOpt = ps.remove(EndPoint)
+    val appIdOpt = ps.remove(AppId)
+    val appSecretOpt = ps.remove(AppSecret)
+    val vendorOpt = ps.remove(Vendor)
     require(vendorOpt.nonEmpty && endpointOpt.nonEmpty && appIdOpt.nonEmpty && appSecretOpt.nonEmpty)
     val vendor = vendorOpt.get
     val endpoint = endpointOpt.get

@@ -18,7 +18,6 @@
 package org.beangle.notify.sms
 
 import org.beangle.commons.lang.Consoles
-import org.beangle.notify.sms.vendor.{B2mSmsSender, EcuplSmsSender, LixinSmsSender}
 
 /** 交互式命令行调试 {@link SmsSender}。 */
 object SmsMain {
@@ -27,7 +26,7 @@ object SmsMain {
 
   def main(args: Array[String]): Unit = {
     val vendor = chooseVendor(args.headOption)
-    val sender = createSender(vendor)
+    val sender = findSender(vendor)
 
     println(s"Ready. vendor=$vendor")
     println("Commands:")
@@ -52,21 +51,14 @@ object SmsMain {
       case _ => Consoles.prompt("vendor (lixin|b2m|ecupl): ", null)(Set("lixin", "b2m", "ecupl").contains)
   }
 
-  private def createSender(vendor: String): SmsSender = {
+  private def findSender(vendor: String): SmsSender = {
     val endpoint = Consoles.prompt(s"endpoint: ")
     val appId = Consoles.prompt("appId: ")
     val appSecret = Consoles.prompt("appSecret: ")
 
     this.conf = new CliConfig(vendor, endpoint, appId, appSecret)
-
-    val s = vendor match {
-      case "lixin" => new LixinSmsSender(endpoint, appId, appSecret)
-      case "b2m" => new B2mSmsSender(endpoint, appId, appSecret)
-      case "ecupl" => new EcuplSmsSender(endpoint, appId, appSecret)
-      case _ => throw new IllegalArgumentException(s"cannot find vendor for ${vendor}")
-    }
-    s.init()
-    s
+    import SmsSenderFactory.*
+    createSender(Map(Vendor -> vendor, EndPoint -> endpoint, AppId -> appId, AppSecret -> appSecret))
   }
 
   private def repl(sender: SmsSender): Unit = {
@@ -102,7 +94,15 @@ object SmsMain {
     println(s"vendor=${conf.vendor}")
     println(s"endpoint=${conf.endpoint}")
     println(s"appId=${conf.appId}")
-    println(s"appSecret=${conf.appSecret}")
+    println(s"appSecret=${maskSecret(conf.appSecret)}")
+  }
+
+  /** 仅用于 `show` 输出，保留首尾各 2 字符便于对照是否用错密钥，中间固定掩码。 */
+  private def maskSecret(secret: String): String = {
+    val s = secret.trim
+    if s.isEmpty then "(empty)"
+    else if s.length <= 4 then "****"
+    else s"${s.substring(0, 2)}****${s.substring(s.length - 2)}"
   }
 
 }
