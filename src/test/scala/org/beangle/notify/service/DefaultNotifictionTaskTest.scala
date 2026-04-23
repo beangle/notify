@@ -43,6 +43,7 @@ class DefaultNotifictionTaskTest extends AnyFunSpec with Matchers:
         mailSender.username = "user1"
         mailSender.password = "password"
         mailSender.port = 3025
+        mailSender.init()
 
         val notifier = new DefaultMailNotifier(mailSender, "测试name<user1@localhost>")
         val task = new DefaultNotificationTask(notifier)
