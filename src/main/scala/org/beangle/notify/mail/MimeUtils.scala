@@ -17,20 +17,25 @@
 
 package org.beangle.notify.mail
 
-import scala.collection.mutable
 import jakarta.mail.internet.InternetAddress
 import org.beangle.commons.lang.Strings
 
-object MimeUtils:
+import scala.collection.mutable
 
-  def parseAddress(address: String, encoding: String): List[InternetAddress] =
+/** 邮件 MIME 相关小工具（地址解析等）。 */
+object MimeUtils {
+
+  /** 将逗号分隔的 RFC822 地址串解析为 `InternetAddress` 列表；空串返回空列表。`encoding` 非空时用于 personal 名编码。 */
+  def parseAddress(address: String, encoding: String): List[InternetAddress] = {
     if (Strings.isEmpty(address)) List.empty
-    try
-      var parsed = InternetAddress.parse(address)
-      var returned = new mutable.ArrayBuffer[InternetAddress]
-      parsed.foreach(raw => returned.addOne(if (encoding != null) new InternetAddress(raw.getAddress(), raw.getPersonal(), encoding) else raw))
-      returned.toList
-    catch
-      case ex: Exception =>
-        throw new RuntimeException("Failed to parse embedded personal name to correct encoding", ex)
-        List.empty
+    else {
+      try
+        val parsed = InternetAddress.parse(address)
+        val returned = new mutable.ArrayBuffer[InternetAddress]
+        parsed.foreach(raw => returned.addOne(if (encoding != null) new InternetAddress(raw.getAddress, raw.getPersonal, encoding) else raw))
+        returned.toList
+      catch
+        case ex: Exception => throw new RuntimeException("Failed to parse embedded personal name to correct encoding", ex)
+    }
+  }
+}

@@ -19,13 +19,16 @@ package org.beangle.notify.mail
 
 import org.beangle.notify.{Message, Notifier, NotifyLogger, SendingObserver}
 
+/** 将通用 `Message` 转为 `MailMessage` 并委托 `mailSender` 投递；子类实现主题/正文拼装。 */
 abstract class AbstractMailNotifier(val mailSender: MailSender, val from: String) extends Notifier:
 
   override def getType: String = "mail"
 
+  /** 单条投递，内部转为列表调用批量接口。 */
   override def deliver(message: Message, observer: SendingObserver): Unit =
     deliver(List(message), observer)
 
+  /** 仅处理 `MailMessage`；其它类型记警告。未设发件人时用构造参数 `from`。 */
   override def deliver(messages: Iterable[Message], observer: SendingObserver): Unit =
     messages foreach {
       case msg: MailMessage =>
@@ -35,6 +38,8 @@ abstract class AbstractMailNotifier(val mailSender: MailSender, val from: String
       case _ => NotifyLogger.warn("Mail Notifier should deliver mail message only")
     }
 
+  /** 由子类从业务消息生成邮件主题。 */
   protected def buildSubject(msg: Message): String
 
+  /** 由子类从业务消息生成邮件正文。 */
   protected def buildText(msg: Message): String

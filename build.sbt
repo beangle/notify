@@ -30,7 +30,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "beangle-notify",
     common,
-    Compile / run / mainClass := Some("org.beangle.notify.sms.SmsMain"),
+    Compile / run / mainClass := Some("org.beangle.notify.Main"),
     libraryDependencies ++= Seq(slf4j, logback_classic % "test", greenmail, scalatest),
     libraryDependencies ++= Seq(beangle_commons, beangle_cache, jakarta_mail_api, jakarta_mail_angus),
     libraryDependencies ++= Seq(jedis % "optional")

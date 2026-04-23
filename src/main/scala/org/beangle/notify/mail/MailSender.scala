@@ -19,6 +19,10 @@ package org.beangle.notify.mail
 
 import org.beangle.notify.SendingObserver
 
+/** 邮件发送抽象：由 `JavaMailSender` 等实现，通过 `SendingObserver` 汇报进度与错误。 */
 trait MailSender:
+  /** 发送单封邮件。 */
   def send(message: MailMessage, observer: SendingObserver): Unit
+
+  /** 批量发送；实现可优化为共用连接等。 */
   def send(message: Iterable[MailMessage], observer: SendingObserver): Unit

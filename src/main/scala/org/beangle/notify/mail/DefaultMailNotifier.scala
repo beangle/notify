@@ -19,6 +19,7 @@ package org.beangle.notify.mail
 
 import org.beangle.notify.Message
 
+/** `AbstractMailNotifier` 的默认实现：主题与正文直接取自 `Message`。 */
 class DefaultMailNotifier(mailSender: MailSender, from: String) extends AbstractMailNotifier(mailSender, from):
   protected def buildSubject(context: Message): String = context.subject
   protected def buildText(context: Message): String = context.text

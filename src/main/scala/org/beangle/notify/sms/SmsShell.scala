@@ -19,12 +19,12 @@ package org.beangle.notify.sms
 
 import org.beangle.commons.lang.Consoles
 
-/** 交互式命令行调试 {@link SmsSender}。 */
-object SmsMain {
+/** 交互式命令行调试 `SmsSender`。由 `org.beangle.notify.Main` 调度。 */
+object SmsShell {
 
   private var conf: CliConfig = _
 
-  def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
     val vendor = chooseVendor(args.headOption)
     val sender = findSender(vendor)
 
@@ -48,7 +48,9 @@ object SmsMain {
   private def chooseVendor(argVendor: Option[String]): String = {
     argVendor.map(_.trim.toLowerCase) match
       case Some(v) if Set("lixin", "b2m", "ecupl").contains(v) => v
-      case _ => Consoles.prompt("vendor (lixin|b2m|ecupl): ", null)(Set("lixin", "b2m", "ecupl").contains)
+      case _ =>
+        val v = Consoles.prompt("vendor (lixin|b2m|ecupl): ", "lixin").trim.toLowerCase
+        if Set("lixin", "b2m", "ecupl").contains(v) then v else "lixin"
   }
 
   private def findSender(vendor: String): SmsSender = {
