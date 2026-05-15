@@ -25,7 +25,13 @@ trait SmsCodeService {
 
   def send(receiver: Receiver): (Boolean, String)
 
-  def verify(mobile: String, code: String): Boolean
+  /** 验证验证码
+   * @param mobile
+   * @param code
+   * @param destroy 验证成功后是否销毁，默认验证失败不销毁
+   * @return
+   */
+  def verify(mobile: String, code: String, destroy: Boolean): Boolean
 
   def validate(mobile: String): Boolean
 

@@ -64,9 +64,9 @@ class DefaultSmsCodeService extends SmsCodeService {
         }
   }
 
-  override def verify(mobile: String, code: String): Boolean = {
+  override def verify(mobile: String, code: String, destroy: Boolean): Boolean = {
     val matched = get(mobile).contains(code)
-    if matched then remove(mobile)
+    if matched && destroy then remove(mobile)
     matched
   }
 
