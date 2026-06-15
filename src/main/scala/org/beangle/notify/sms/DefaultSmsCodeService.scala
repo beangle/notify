@@ -99,7 +99,7 @@ class DefaultSmsCodeService extends SmsCodeService {
         cacheManager.ttl = ttl
         cacheManager.getCache(cacheName, classOf[String], classOf[String])
       case Some(client) =>
-        val cacheManager = new RedisCacheManager(client, DefaultBinarySerializer, true)
+        val cacheManager = new RedisCacheManager(client, new DefaultBinarySerializer, true)
         cacheManager.ttl = ttl
         cacheManager.getCache(cacheName, classOf[String], classOf[String])
     }
