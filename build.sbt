@@ -23,8 +23,8 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Notify Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
 
-val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.1.2"
-val beangle_cache = "org.beangle.cache" % "beangle-cache" % "0.1.19"
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.2.0"
+val beangle_cache = "org.beangle.cache" % "beangle-cache" % "0.1.20"
 
 lazy val root = (project in file("."))
   .settings(
