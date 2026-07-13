@@ -22,7 +22,7 @@ import org.beangle.commons.net.http.{HttpUtils, Request}
 import org.beangle.commons.text.escape.XmlEscaper
 import org.beangle.commons.xml.Document
 import org.beangle.notify.NotifyLogger
-import org.beangle.notify.sms.{AbstractSmsSender, Receiver, SmsResponse}
+import org.beangle.notify.sms.*
 
 /** Lixin平台 SOAP 1.1 WebService（Axis2，WSDL 见学校文档）。
  *
@@ -32,13 +32,22 @@ import org.beangle.notify.sms.{AbstractSmsSender, Receiver, SmsResponse}
 class LixinSmsSender(endpoint: String, appId: String, appSecret: String)
   extends AbstractSmsSender(endpoint, appId, appSecret) {
 
-  override def send(receiver: Receiver, contents: String): SmsResponse = {
-    val inner = buildPayloadXml(receiver, contents)
-    val (opName, soapAction) = ("sendSmsWithPhoneNum", "urn:sendSmsWithPhoneNum")
+  override def send(receiver: Mobile, contents: String): SmsResponse = {
+    sendTo(receiver.mobile, contents, "phoneNum", "sendSmsWithPhoneNum")
+  }
+
+  /** 按学号或工号发送短信。 */
+  override def send(user: User, contents: String): SmsResponse = {
+    sendTo(user.code, contents, "no", "sendSms")
+  }
+
+  private def sendTo(recipient: String, contents: String, recipientElement: String,
+                     opName: String): SmsResponse = {
+    val inner = buildPayloadXml(recipient, contents, recipientElement)
     val envelope = buildSoapEnvelope(inner, opName)
     val req = Request
       .build(envelope, "text/xml; charset=UTF-8")
-      .header("SOAPAction", "\"" + soapAction + "\"")
+      .header("SOAPAction", "\"urn:" + opName + "\"")
     val res = HttpUtils.post(soap11EndpointUrl, req)
     if !res.isOk then {
       NotifyLogger.error("sms http error: " + res.status + " " + res.getText)
@@ -52,13 +61,16 @@ class LixinSmsSender(endpoint: String, appId: String, appSecret: String)
   private def soap11EndpointUrl: String =
     s"${endpoint.stripSuffix("/")}/msg.msgHttpSoap11Endpoint/"
 
-  private def buildPayloadXml(receiver: Receiver, contents: String): String = {
+  private[sms] def buildPayloadXml(recipient: String, contents: String,
+                                   recipientElement: String): String = {
     val b = new StringBuilder
     b.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
     b.append("<message>")
     b.append("<account>").append(XmlEscaper.escapeText(appId)).append("</account>")
     b.append("<password>").append(XmlEscaper.escapeText(appSecret)).append("</password>")
-    b.append("<phoneNum>").append(XmlEscaper.escapeText(receiver.mobile)).append("</phoneNum>")
+    b.append("<").append(recipientElement).append(">")
+      .append(XmlEscaper.escapeText(recipient))
+      .append("</").append(recipientElement).append(">")
     b.append("<content>").append(XmlEscaper.escapeText(contents)).append("</content>")
     b.append("</message>")
     b.toString

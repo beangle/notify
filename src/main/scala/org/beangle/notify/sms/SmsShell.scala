@@ -88,7 +88,7 @@ object SmsShell {
     }
     val mobile = raw.substring(0, idx).trim
     val message = raw.substring(idx + 1).trim
-    val res = sender.send(Receiver(mobile, name = mobile), message)
+    val res = sender.send(Mobile(mobile, name = mobile), message)
     printResult(res)
   }
 

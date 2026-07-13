@@ -42,11 +42,11 @@ class DefaultSmsCodeService extends SmsCodeService {
   private val cache = buildCache()
   private val mobilePattern = Pattern.compile("^1(3[0-9]|4[01456879]|5[0-3,5-9]|6[2567]|7[0-8]|8[0-9]|9[0-3,5-9])\\d{8}$")
 
-  override def send(receiver: Receiver): (Boolean, String) = {
+  override def send(receiver: Mobile): (Boolean, String) = {
     send(receiver, defaultTemplate)
   }
 
-  override def send(receiver: Receiver, template: String): (Boolean, String) = {
+  override def send(receiver: Mobile, template: String): (Boolean, String) = {
     val templateStr = if Strings.isBlank(template) then defaultTemplate else template
     get(receiver.mobile) match
       case Some(code) => (true, "验证码已经发送")

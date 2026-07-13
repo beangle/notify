@@ -20,7 +20,7 @@ package org.beangle.notify.sms.vendor
 import org.beangle.commons.lang.{Charsets, Strings}
 import org.beangle.commons.net.http.{HttpUtils, Request}
 import org.beangle.notify.NotifyLogger
-import org.beangle.notify.sms.{AbstractSmsSender, Receiver, SmsResponse}
+import org.beangle.notify.sms.{AbstractSmsSender, Mobile, SmsResponse, User}
 
 import java.net.URLEncoder
 import java.time.temporal.ChronoUnit
@@ -50,7 +50,11 @@ class EcuplSmsSender(endpoint: String, appId: String, appSecret: String)
     }
   }
 
-  override def send(receiver: Receiver, contents: String): SmsResponse = {
+  override def send(receiver: User, contents: String): SmsResponse = {
+    throw new RuntimeException("not implemented")
+  }
+
+  override def send(receiver: Mobile, contents: String): SmsResponse = {
     fetchToken() match
       case Some(token) =>
         val postUrl = s"${endpoint}/message/sendMessageBySMSApi"

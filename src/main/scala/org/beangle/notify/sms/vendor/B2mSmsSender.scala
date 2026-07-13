@@ -20,7 +20,7 @@ package org.beangle.notify.sms.vendor
 import org.beangle.commons.codec.digest.Digests
 import org.beangle.commons.lang.Charsets
 import org.beangle.commons.net.http.HttpUtils
-import org.beangle.notify.sms.{AbstractSmsSender, Receiver, SmsResponse}
+import org.beangle.notify.sms.{AbstractSmsSender, Mobile, SmsResponse, User}
 
 import java.net.URLEncoder
 import java.time.LocalDateTime
@@ -31,7 +31,11 @@ import java.time.format.DateTimeFormatter
 class B2mSmsSender(endpoint: String, appId: String, appSecret: String)
   extends AbstractSmsSender(endpoint, appId, appSecret) {
 
-  override def send(receiver: Receiver, contents: String): SmsResponse = {
+  override def send(receiver: User, contents: String): SmsResponse = {
+    throw new RuntimeException("not implemented")
+  }
+
+  override def send(receiver: Mobile, contents: String): SmsResponse = {
     val sendTime = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now())
     val sign = Digests.md5Hex(appId + appSecret + sendTime)
     val encodedContent = URLEncoder.encode(contents, Charsets.UTF_8)

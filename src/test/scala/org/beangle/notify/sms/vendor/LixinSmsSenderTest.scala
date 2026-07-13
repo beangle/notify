@@ -24,6 +24,23 @@ class LixinSmsSenderTest extends AnyFunSpec with Matchers:
 
   private val sender = new LixinSmsSender("http://duanxin.lixin.edu.cn/dxjk/services", "demo", "secret")
 
+  describe("LixinSmsSender.buildPayloadXml") {
+    it("should build a payload for a student or employee number") {
+      val xml = sender.buildPayloadXml("20260001,080800", "测试内容", "no")
+
+      xml should include("<no>20260001,080800</no>")
+      xml should not include "<phoneNum>"
+      xml should include("<content>测试内容</content>")
+    }
+
+    it("should escape recipient and content") {
+      val xml = sender.buildPayloadXml("A&B", "1 < 2", "no")
+
+      xml should include("<no>A&amp;B</no>")
+      xml should include("<content>1 &lt; 2</content>")
+    }
+  }
+
   describe("LixinSmsSender.parseBusinessXml") {
     it("should parse success response") {
       val soap =

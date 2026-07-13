@@ -21,9 +21,9 @@ package org.beangle.notify.sms
  */
 trait SmsCodeService {
 
-  def send(receiver: Receiver, template: String): (Boolean, String)
+  def send(receiver: Mobile, template: String): (Boolean, String)
 
-  def send(receiver: Receiver): (Boolean, String)
+  def send(receiver: Mobile): (Boolean, String)
 
   /** 验证验证码
    * @param mobile

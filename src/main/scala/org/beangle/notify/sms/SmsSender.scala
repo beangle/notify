@@ -19,5 +19,7 @@ package org.beangle.notify.sms
 
 trait SmsSender {
 
-  def send(receiver: Receiver, contents: String): SmsResponse
+  def send(receiver: Mobile, contents: String): SmsResponse
+
+  def send(receiver: User, contents: String): SmsResponse
 }
