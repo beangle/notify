@@ -1,17 +1,17 @@
 import org.beangle.parent.Dependencies.*
 import org.beangle.parent.Settings.*
 
-ThisBuild / organization := "org.beangle.notify"
-ThisBuild / version := "0.1.27-SNAPSHOT"
+organization := "org.beangle.notify"
+version := "0.1.27-SNAPSHOT"
 
-ThisBuild / scmInfo := Some(
+scmInfo := Some(
   ScmInfo(
     uri("https://github.com/beangle/notify"),
     "scm:git@github.com:beangle/notify.git"
   )
 )
 
-ThisBuild / developers := List(
+developers := List(
   Developer(
     id = "chaostone",
     name = "Tihua Duan",
@@ -20,8 +20,8 @@ ThisBuild / developers := List(
   )
 )
 
-ThisBuild / description := "The Beangle Notify Library"
-ThisBuild / homepage := Some(uri("https://beangle.github.io/notify/index.html"))
+description := "The Beangle Notify Library"
+homepage := Some(uri("https://beangle.github.io/notify/index.html"))
 
 val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.3.2"
 val beangle_cache = "org.beangle.cache" % "beangle-cache" % "0.1.21"
