@@ -6,7 +6,7 @@ ThisBuild / version := "0.1.27-SNAPSHOT"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
-    url("https://github.com/beangle/notify"),
+    uri("https://github.com/beangle/notify"),
     "scm:git@github.com:beangle/notify.git"
   )
 )
@@ -16,15 +16,15 @@ ThisBuild / developers := List(
     id = "chaostone",
     name = "Tihua Duan",
     email = "duantihua@gmail.com",
-    url = url("http://github.com/duantihua")
+    url = uri("http://github.com/duantihua")
   )
 )
 
 ThisBuild / description := "The Beangle Notify Library"
-ThisBuild / homepage := Some(url("https://beangle.github.io/notify/index.html"))
+ThisBuild / homepage := Some(uri("https://beangle.github.io/notify/index.html"))
 
-val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.2.1"
-val beangle_cache = "org.beangle.cache" % "beangle-cache" % "0.1.20"
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.3.2"
+val beangle_cache = "org.beangle.cache" % "beangle-cache" % "0.1.21"
 
 lazy val root = (project in file("."))
   .settings(
