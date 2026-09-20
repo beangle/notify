@@ -18,11 +18,12 @@
 package org.beangle.notify.sms
 
 import org.beangle.commons.lang.Consoles
+import scala.compiletime.uninitialized
 
 /** 交互式命令行调试 `SmsSender`。由 `org.beangle.notify.Main` 调度。 */
 object SmsShell {
 
-  private var conf: CliConfig = _
+  private var conf: CliConfig = uninitialized
 
   def run(args: Array[String]): Unit = {
     val vendor = chooseVendor(args.headOption)

@@ -19,9 +19,10 @@ package org.beangle.notify.service
 
 import org.beangle.notify.Notifier
 import scala.collection.mutable
+import scala.compiletime.uninitialized
 
 trait DefaultNotifierService extends NotifierService:
 
-  var notifiers: mutable.Map[String, Notifier] = _
+  var notifiers: mutable.Map[String, Notifier] = uninitialized
 
   def getNotifier(notifierId: String): Notifier = notifiers.get(notifierId).orNull

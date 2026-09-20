@@ -25,17 +25,18 @@ import java.io.{ByteArrayInputStream, File, InputStream}
 import java.nio.file.Files
 import java.time.Instant
 import scala.collection.mutable
+import scala.compiletime.uninitialized
 
 /** 邮件附件：显示名、内容流（发送时会被读取并关闭）、可选 MIME 类型。 */
 final case class MailAttachment(name: String, content: InputStream, contentType: Option[String] = None)
 
 /** 邮件消息模型：收发件人、主题正文、可选附件；与 `JavaMailSender` 配合使用。 */
 class MailMessage extends AbstractMessage {
-  var from: InternetAddress = _
+  var from: InternetAddress = uninitialized
   var to: List[InternetAddress] = List.empty
   var cc: List[InternetAddress] = List.empty
   var bcc: List[InternetAddress] = List.empty
-  var sentAt: Instant = _
+  var sentAt: Instant = uninitialized
   var attachments: List[MailAttachment] = List.empty
 
   /** 从 `contentType` 中解析出的 charset 片段（用于地址编码等）。 */

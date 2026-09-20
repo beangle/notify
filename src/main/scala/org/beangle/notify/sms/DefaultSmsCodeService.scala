@@ -25,11 +25,12 @@ import org.beangle.commons.lang.Strings
 import redis.clients.jedis.RedisClient
 
 import java.util.regex.Pattern
+import scala.compiletime.uninitialized
 
 /** 缺省的短信验证码服务
  */
 class DefaultSmsCodeService extends SmsCodeService {
-  var smsSender: SmsSender = _
+  var smsSender: SmsSender = uninitialized
   //验证码模板
   var defaultTemplate: String = "您的验证码为{code}，{ttl}分钟有效!"
   //默认五分钟有效

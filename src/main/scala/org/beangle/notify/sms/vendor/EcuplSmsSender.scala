@@ -25,13 +25,14 @@ import org.beangle.notify.sms.{AbstractSmsSender, Mobile, SmsResponse, User}
 import java.net.URLEncoder
 import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant}
+import scala.compiletime.uninitialized
 
 /** Ecupl 验证码发送实现
  */
 class EcuplSmsSender(endpoint: String, appId: String, appSecret: String)
   extends AbstractSmsSender(endpoint, appId, appSecret) {
 
-  var tokenInfo: (String, Instant) = _
+  var tokenInfo: (String, Instant) = uninitialized
   var tokenLiveTime = 600 //600s
 
   private def fetchToken(): Option[String] = {

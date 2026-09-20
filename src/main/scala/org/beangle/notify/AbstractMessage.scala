@@ -18,9 +18,10 @@
 package org.beangle.notify
 
 import java.util.Properties
+import scala.compiletime.uninitialized
 
 abstract class AbstractMessage extends Message:
-  var subject: String = _
-  var text: String = _
+  var subject: String = uninitialized
+  var text: String = uninitialized
   var properties: Properties = new Properties
   var contentType: String = Message.TEXT

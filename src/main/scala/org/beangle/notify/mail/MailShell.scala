@@ -22,11 +22,12 @@ import org.beangle.notify.{Message, SendingObserver}
 
 import java.io.File
 import scala.collection.mutable.ArrayBuffer
+import scala.compiletime.uninitialized
 
 /** 交互式命令行调试 `MailSender`。由 `org.beangle.notify.Main` 调度。 */
 object MailShell {
 
-  private var conf: CliConfig = _
+  private var conf: CliConfig = uninitialized
   private var draft: Draft = newDraft()
 
   /** 提示 SMTP 与发件人后进入 `mail>` 命令循环。 */

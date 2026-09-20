@@ -29,6 +29,7 @@ import java.io.{ByteArrayOutputStream, UnsupportedEncodingException}
 import java.util as ju
 import java.util.Properties
 import scala.collection.mutable.ArrayBuffer
+import scala.compiletime.uninitialized
 
 /** Jakarta Mail 实现的 SMTP 发送器。需先配置 `properties`/`host` 等并调用 `init()` 再发信；也可用工厂方法 `smtp` 一次性完成。 */
 object JavaMailSender:
@@ -77,19 +78,19 @@ class JavaMailSender extends MailSender, Initializing {
 
   var protocol: String = "smtp"
 
-  var host: String = _
+  var host: String = uninitialized
 
   var port: Int = -1
 
-  var username: String = _
+  var username: String = uninitialized
 
-  var password: String = _
+  var password: String = uninitialized
 
-  var defaultEncoding: String = _
+  var defaultEncoding: String = uninitialized
 
   var sendInterval: Long = 0
 
-  private var session: Session = _
+  private var session: Session = uninitialized
 
   /** 根据当前 `properties` 创建邮件 `Session`，发信前必须调用一次（`smtp` 工厂已代为调用）。 */
   override def init(): Unit = {
